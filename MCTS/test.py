@@ -130,5 +130,5 @@ def playGameComputerVsComputer():
     print(new_state.get_score())
 
 # generateGames()
-# playGameHumanVsComputer()
-playGameHumanVsHuman()
+playGameHumanVsComputer()
+#playGameHumanVsHuman()
