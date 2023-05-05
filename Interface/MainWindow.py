@@ -1,20 +1,21 @@
 import threading
-from copy import copy, deepcopy
-
-from go import GoGameState, GoAPI, GoMove
-import pyttsx3 as pyttsx3
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QPointF, QTimer, QThread, QObject, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QBrush, QPen, QColor
-from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsItem, \
-    QGraphicsRectItem, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QComboBox, QLabel, QCheckBox
-import speech_recognition as sr
 import sys
-import json
+import os
+import speech_recognition as sr
+import loadData
 
-colors = {}
-microphoneOn = False
-soundOn = False
+sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath('../MCTS'))
+
+from MCTS.go import GoGameState, GoAPI, GoMove
+from copy import deepcopy
+from SoundButton import SoundButton
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QBrush, QPen, QColor
+from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsItem, QWidget, \
+    QVBoxLayout, QHBoxLayout, QMessageBox, QComboBox, QLabel, QCheckBox
+
 
 class SettingsMenu(QWidget):
     def __init__(self, window_size):
@@ -32,8 +33,8 @@ class SettingsMenu(QWidget):
         self.microphone_checkbox = QCheckBox()
 
         # Setup checkboxes
-        self.audio_checkbox.setChecked(soundOn)
-        self.microphone_checkbox.setChecked(microphoneOn)
+        self.audio_checkbox.setChecked(loadData.soundOn)
+        self.microphone_checkbox.setChecked(loadData.microphoneOn)
         self.audio_checkbox.stateChanged.connect(self.audio_checkbox_changed)
         self.microphone_checkbox.stateChanged.connect(self.microphone_checkbox_changed)
 
@@ -75,12 +76,14 @@ class SettingsMenu(QWidget):
         self.style_buttons()
 
     def audio_checkbox_changed(self, new_state):
-        global soundOn
-        soundOn = new_state
+        print(new_state)
+        loadData.soundOn = new_state
+        print(loadData.soundOn)
 
     def microphone_checkbox_changed(self, new_state):
-        global microphoneOn
-        microphoneOn = new_state
+        print(new_state)
+        loadData.microphoneOn = new_state
+        print(loadData.microphoneOn)
 
     def back(self):
         self.hide()
@@ -103,7 +106,7 @@ class SettingsMenu(QWidget):
            QPushButton:hover {
                background-color: %s;
            }
-           """ % (colors['Accent'], colors['Text'], colors['Hover'])
+           """ % (loadData.colors['Accent'], loadData.colors['Text'], loadData.colors['Hover'])
 
         self.back_button.setStyleSheet(style)
         self.audio_label.setStyleSheet(style)
@@ -113,38 +116,14 @@ class SettingsMenu(QWidget):
         self.microphone_label.setFixedWidth(self.window_size // 3)
 
 
-class SoundButton(QPushButton):
-    def __init__(self, text, parent=None):
-        super().__init__(text, parent)
-
-    def enterEvent(self, event):
-        if soundOn:
-            t = threading.Thread(target=self.read_text)
-            t.start()
-
-    def read_text(self):
-        try:
-            engine = pyttsx3.init()
-            engine.setProperty('rate', 150)
-            engine.say(self.text())
-            engine.runAndWait()
-        except:
-            pass
-
-
-def read_colors_from_file(filepath):
-    global colors
-    with open(filepath) as f:
-        colors = json.load(f)
-
-
 class MainMenu(QWidget):
     def __init__(self, window_size):
         super().__init__()
         self.window_size = window_size
-        # Audio recognition
-        if microphoneOn:
+
+        if loadData.microphoneOn:
             self.audioRecognition()
+
         self.initUI()
 
     def audioRecognition(self):
@@ -178,7 +157,7 @@ class MainMenu(QWidget):
 
         self.setLayout(vbox)
 
-        self.setStyleSheet(f"background-color: {colors['Background']};")
+        self.setStyleSheet(f"background-color: {loadData.colors['Background']};")
         self.resize(self.window_size, self.window_size)
         self.style_buttons()
 
@@ -220,7 +199,7 @@ class MainMenu(QWidget):
         QPushButton:hover {
             background-color: %s;
         }
-        """ % (colors['Accent'], colors['Text'], colors['Hover'])
+        """ % (loadData.colors['Accent'], loadData.colors['Text'], loadData.colors['Hover'])
 
         self.play_button.setStyleSheet(style)
         self.quit_button.setStyleSheet(style)
@@ -231,7 +210,7 @@ class MainMenu(QWidget):
         self.settings_button.setFixedWidth(self.window_size // 3)
 
     def quit(self):
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.stop_listening.set()
             app.quit()
             self.listening_thread.join()
@@ -239,7 +218,7 @@ class MainMenu(QWidget):
             app.quit()
 
     def settings(self):
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.stop_listening.set()
             self.hide()  # Hide the Main Menu
             self.listening_thread.join()
@@ -256,7 +235,7 @@ class MainMenu(QWidget):
         pass
 
     def play(self):
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.stop_listening.set()
             self.hide()  # Hide the Main Menu
             self.listening_thread.join()
@@ -274,7 +253,7 @@ class PlayMenu(QWidget):
         self.window_size = window_size
         self.resize(self.window_size, self.window_size)
         self.initUI()
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.audioRecognition()
 
     def audioRecognition(self):
@@ -369,7 +348,7 @@ class PlayMenu(QWidget):
         QPushButton:hover {
             background-color: %s;
         }
-        """ % (colors['Accent'], colors['Text'], colors['Hover'])
+        """ % (loadData.colors['Accent'], loadData.colors['Text'], loadData.colors['Hover'])
 
         dropdown_style = '''
         QComboBox QAbstractItemView {{
@@ -379,7 +358,7 @@ class PlayMenu(QWidget):
         QComboBox {{
           background: {};
         }}
-        '''.format(colors['Accent'], colors['Hover'], colors['Accent'])
+        '''.format(loadData.colors['Accent'], loadData.colors['Hover'], loadData.colors['Accent'])
 
         self.start_button.setStyleSheet(button_style)
         self.back_button.setStyleSheet(button_style)
@@ -387,11 +366,11 @@ class PlayMenu(QWidget):
         self.player_2_dropdown.setStyleSheet(dropdown_style)
 
         pallete_dropdown1 = self.player_1_dropdown.palette()
-        pallete_dropdown1.setColor(pallete_dropdown1.Highlight, QColor(colors['Hover']))
+        pallete_dropdown1.setColor(pallete_dropdown1.Highlight, QColor(loadData.colors['Hover']))
         self.player_1_dropdown.setPalette(pallete_dropdown1)
 
         pallete_dropdown2 = self.player_2_dropdown.palette()
-        pallete_dropdown2.setColor(pallete_dropdown2.Highlight, QColor(colors['Hover']))
+        pallete_dropdown2.setColor(pallete_dropdown2.Highlight, QColor(loadData.colors['Hover']))
         self.player_2_dropdown.setPalette(pallete_dropdown1)
 
         self.start_button.setFixedWidth(self.window_size // 3)
@@ -401,12 +380,11 @@ class PlayMenu(QWidget):
 
     def back(self):
         self.hide()
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.stop_listening.set()
             self.listening_thread.join()
         self.mainMenu = MainMenu(self.window_size)
         self.mainMenu.show()
-
 
     def start_game(self):
         # Retrieve the selected options from the dropdown menus
@@ -415,7 +393,7 @@ class PlayMenu(QWidget):
 
         # Do something with the selected options (e.g. start the game with these options)
         print(f'Starting game with options: {option1}, {option2}')
-        if microphoneOn:
+        if loadData.microphoneOn:
             self.stop_listening.set()
             self.hide()  # Hide the Main Menu
             self.listening_thread.join()
@@ -476,14 +454,13 @@ class GameWidget(QWidget):
            QPushButton:hover {
                background-color: %s;
            }
-           """ % (colors['Accent'], colors['Text'], colors['Hover'])
+           """ % (loadData.colors['Accent'], loadData.colors['Text'], loadData.colors['Hover'])
 
         self.pass_button.setStyleSheet(style)
         self.back_to_menu_button.setStyleSheet(style)
 
         self.pass_button.setFixedWidth(self.window_size // 3)
         self.back_to_menu_button.setFixedWidth(self.window_size // 3)
-
 
     def show_confirmation_dialog(self):
         # Create the confirmation dialog
@@ -503,7 +480,6 @@ class GameWidget(QWidget):
         self.hide()
         self.mainMenu = MainMenu(self.window_size)
         self.mainMenu.show()
-
 
 
 class GoBoard(QGraphicsView):
@@ -554,7 +530,7 @@ class GoBoard(QGraphicsView):
 
     def draw_board(self):
         pen = QPen(QColor("black"), 2)
-        brush = QBrush(QColor(139, 69, 19))
+        brush = QBrush(QColor(loadData.colors['Board']))
         for row in range(self.board_size - 1):
             for col in range(self.board_size - 1):
                 x = col * self.grid_size
@@ -599,20 +575,21 @@ class GoBoard(QGraphicsView):
             y = pos.y()
             result, col, row = self.determineIntersection(x, y)
             # print(row, col)
-            if result == True and row >=0 and col >= 0 and row <= self.board_size and col <= self.board_size:
+            if result == True and row >= 0 and col >= 0 and row <= self.board_size and col <= self.board_size:
                 move = GoMove(row, col, self.goState.next_to_move)
                 if self.goState.is_move_legal(move):
                     print("Coordonate: ", row, col)
                     print(col * self.grid_size - self.piece_size / 2)
                     print(row * self.grid_size - self.piece_size / 2)
-                    ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2, row * self.grid_size - self.piece_size / 2,
-                                                    self.piece_size, self.piece_size)
+                    ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2,
+                                                   row * self.grid_size - self.piece_size / 2,
+                                                   self.piece_size, self.piece_size)
                     if self.goState.next_to_move == 1:
                         ellipse.setPen(QPen(Qt.black))
-                        ellipse.setBrush(QBrush(Qt.black))
+                        ellipse.setBrush(QBrush(QColor(loadData.colors['Black'])))
                     else:
                         ellipse.setPen(QPen(Qt.white))
-                        ellipse.setBrush(QBrush(Qt.white))
+                        ellipse.setBrush(QBrush(QColor(loadData.colors['White'])))
 
                     self.scene.addItem(ellipse)
 
@@ -643,7 +620,7 @@ class GoBoard(QGraphicsView):
         print(print_board)
 
     def determineIntersection(self, x, y):
-        print(x,y)
+        print(x, y)
         x -= self.margin
         y -= self.margin
         initial_x = x
@@ -666,11 +643,10 @@ class GoBoard(QGraphicsView):
 
         return False, None, None
 
+
 app = QApplication(sys.argv)
 if __name__ == "__main__":
-
     window_size = 600
-    read_colors_from_file('colors.json')
 
     mainMenu = MainMenu(window_size)
     mainMenu.show()

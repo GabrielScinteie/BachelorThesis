@@ -1,6 +1,7 @@
 from copy import deepcopy
 from common import TwoPlayersAbstractGameState, AbstractGameAction
 
+
 class GoMove(AbstractGameAction):
     def __init__(self, row, column, player):
         self.row = row
