@@ -1,8 +1,10 @@
 import json
+import sys
+import os
 
 colors = {}
 microphoneOn = False
-soundOn = True
+soundOn = False
 
 def read_colors_from_file(filepath):
     global colors
@@ -10,5 +12,5 @@ def read_colors_from_file(filepath):
         colors = json.load(f)
 
 
-read_colors_from_file('colors.json')
+read_colors_from_file('./Interface/colors.json')
 

@@ -2,12 +2,17 @@ import threading
 import sys
 import os
 import speech_recognition as sr
+
+sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath('./MCTS'))
+sys.path.append(os.path.abspath('./Interface'))
+
 import loadData
 
-sys.path.append(os.path.abspath('..'))
-sys.path.append(os.path.abspath('../MCTS'))
 
 from MCTS.go import GoGameState, GoAPI, GoMove
+from MCTS.nodes import TwoPlayersGameMonteCarloTreeSearchNode
+from MCTS.search import MonteCarloTreeSearch
 from copy import deepcopy
 from SoundButton import SoundButton
 from PyQt5 import QtGui
@@ -400,17 +405,19 @@ class PlayMenu(QWidget):
         else:
             self.hide()
 
-        self.game = GameWidget(self.window_size)  # Create an instance of the Game widget
+        self.game = GameWidget(self.window_size, option1, option2)  # Create an instance of the Game widget
         self.game.show()  # Show the Game widget
 
 
 class GameWidget(QWidget):
-    def __init__(self, window_size):
+    def __init__(self, window_size, first_player, second_player):
         super().__init__()
         self.setWindowTitle('Go')
         self.window_size = window_size
         # Create the Board widget
-        self.board = GoBoard(5)
+        self.board = GoBoard(5, first_player, second_player)
+        self.first_player = first_player
+        self.second_player = second_player
 
         # Create the buttons
         self.pass_button = SoundButton("Pass")
@@ -483,8 +490,10 @@ class GameWidget(QWidget):
 
 
 class GoBoard(QGraphicsView):
-    def __init__(self, board_size):
+    def __init__(self, board_size, first_player, second_player):
         super().__init__()
+        self.first_player = first_player
+        self.second_player = second_player
         self.margin = 50
         self.board_size = board_size
         self.grid_size = 80
@@ -517,7 +526,7 @@ class GoBoard(QGraphicsView):
             score = self.goState.get_score()
 
             winner = 'Negru'
-            if result == '-1':
+            if result == -1:
                 winner = 'Alb'
 
             popup = QMessageBox()
@@ -552,6 +561,11 @@ class GoBoard(QGraphicsView):
                 return True
         return False
 
+    def clear_ellipses(self):
+        for item in self.scene.items():
+             if isinstance(item, QGraphicsEllipseItem):
+                self.scene.removeItem(item)
+
     def find_difference_between_boards(self, old_board, new_board):
         removed = []
 
@@ -567,6 +581,31 @@ class GoBoard(QGraphicsView):
         self.goState.move(move)
         print('Turn has been passed')
         print(f'Current player is {self.goState.next_to_move}')
+
+        if self.second_player != 'Human':
+            root = TwoPlayersGameMonteCarloTreeSearchNode(state=self.goState)
+            mcts = MonteCarloTreeSearch(root)
+            best_node = mcts.best_action(None, 2)
+            self.goState = best_node.state
+            self.printBoard(self.goState.board, self.board_size)
+            self.clear_ellipses()
+            for row in range(self.board_size):
+                for col in range(self.board_size):
+                    if self.goState.board[row][col] != '.':
+                        if self.goState.board[row][col] == 'X':
+                            ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2,
+                                                           row * self.grid_size - self.piece_size / 2,
+                                                           self.piece_size, self.piece_size)
+                            ellipse.setPen(QPen(Qt.black))
+                            ellipse.setBrush(QBrush(QColor(loadData.colors['Black'])))
+                            self.scene.addItem(ellipse)
+                        if self.goState.board[row][col] == 'O':
+                            ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2,
+                                                           row * self.grid_size - self.piece_size / 2,
+                                                           self.piece_size, self.piece_size)
+                            ellipse.setPen(QPen(Qt.white))
+                            ellipse.setBrush(QBrush(QColor(loadData.colors['White'])))
+                            self.scene.addItem(ellipse)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -597,11 +636,38 @@ class GoBoard(QGraphicsView):
                     self.goState = self.goState.move(move)
 
                     self.printBoard(self.goState.board, self.board_size)
-                    self.printBoard(oldBoard, self.board_size)
+                    # self.printBoard(oldBoard, self.board_size)
                     to_be_removed = self.find_difference_between_boards(oldBoard, self.goState.board)
                     for row, column in to_be_removed:
                         print(f'Trebuie sa sterg elipsa de la coordonatele ({row},{column})')
                         self.remove_ellipse(row, column)
+                    QApplication.processEvents()
+
+                    if self.second_player != 'Human':
+                        print('Se asteaptă mutarea calculatorului!')
+                        root = TwoPlayersGameMonteCarloTreeSearchNode(state=self.goState)
+                        mcts = MonteCarloTreeSearch(root)
+                        best_node = mcts.best_action(None, 5)
+                        self.goState = best_node.state
+                        self.printBoard(self.goState.board, self.board_size)
+                        self.clear_ellipses()
+                        for row in range(self.board_size):
+                            for col in range(self.board_size):
+                                if self.goState.board[row][col] != '.':
+                                    if self.goState.board[row][col] == 'X':
+                                        ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2,
+                                                                       row * self.grid_size - self.piece_size / 2,
+                                                                       self.piece_size, self.piece_size)
+                                        ellipse.setPen(QPen(Qt.black))
+                                        ellipse.setBrush(QBrush(QColor(loadData.colors['Black'])))
+                                        self.scene.addItem(ellipse)
+                                    if self.goState.board[row][col] == 'O':
+                                        ellipse = QGraphicsEllipseItem(col * self.grid_size - self.piece_size / 2,
+                                                                       row * self.grid_size - self.piece_size / 2,
+                                                                       self.piece_size, self.piece_size)
+                                        ellipse.setPen(QPen(Qt.white))
+                                        ellipse.setBrush(QBrush(QColor(loadData.colors['White'])))
+                                        self.scene.addItem(ellipse)
                 else:
                     popup = QMessageBox()
                     popup.setWindowTitle("Mutare invalida")
