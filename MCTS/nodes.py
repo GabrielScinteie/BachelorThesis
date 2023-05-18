@@ -132,6 +132,7 @@ class TwoPlayersGameMonteCarloTreeSearchNode(MonteCarloTreeSearchNode):
             #         str_game += current_rollout_state.board[i][j]
 
             index += 1
+            print(index)
         # f.write(str(current_rollout_state.game_result))
         # f.write('\n')
         # f.close()

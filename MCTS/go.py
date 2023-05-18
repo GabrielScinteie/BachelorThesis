@@ -1,4 +1,7 @@
 from copy import deepcopy
+
+import torch
+
 from common import TwoPlayersAbstractGameState, AbstractGameAction
 
 
@@ -13,6 +16,7 @@ class GoMove(AbstractGameAction):
             self.player,
             self.row,
             self.column)
+
 
 class GoGameState(TwoPlayersAbstractGameState):
     def __init__(self, state, next_to_move, win=None):
@@ -31,6 +35,19 @@ class GoGameState(TwoPlayersAbstractGameState):
 
     def get_score(self):
         return self.score
+
+    def _convert_board_to_numbers(self):
+        converted_matrix = []
+        char_to_val = {'X': 1.0, '.': 0.0, 'O': -1.0}
+        for row in self.board:
+            converted_row = [char_to_val[char] for char in row]
+            converted_matrix.append(converted_row)
+
+        return converted_matrix
+
+    def get_encoded_state(self):
+        encoded_state = self._convert_board_to_numbers()
+        return encoded_state
 
     @property
     def game_result(self):

@@ -1,5 +1,6 @@
 import time
 from go import printBoard
+
 class MonteCarloTreeSearch(object):
 
     def __init__(self, node):
@@ -26,6 +27,8 @@ class MonteCarloTreeSearch(object):
                 v = self._tree_policy()
                 reward = v.rollout()
                 v.backpropagate(reward)
+
+            time.sleep(100)
 
         return self.root.best_child(c_param=0.)
 

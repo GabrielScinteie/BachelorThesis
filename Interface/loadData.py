@@ -1,10 +1,9 @@
 import json
-import sys
-import os
 
 colors = {}
 microphoneOn = False
 soundOn = False
+
 
 def read_colors_from_file(filepath):
     global colors

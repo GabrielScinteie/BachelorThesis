@@ -1,7 +1,11 @@
+import torch
+from matplotlib import pyplot as plt
+
 from nodes import TwoPlayersGameMonteCarloTreeSearchNode
 from search import MonteCarloTreeSearch
 from go import GoAPI, printBoard, GoGameState, GoMove
 from copy import deepcopy
+from Model import ResNet
 
 # state = np.zeros((3, 3))
 # state[0][0] = 1
@@ -37,8 +41,6 @@ def playGameHumanVsHuman():
 
     print(initial_board_state.game_result)
     print(initial_board_state.get_score())
-
-
 
 def playGameHumanVsComputer():
     size = 3
@@ -104,7 +106,7 @@ def playGameComputerVsComputer():
     initial_board_state = GoGameState(state=goInitialState, next_to_move=goInitialState.currentPlayer)
     root = TwoPlayersGameMonteCarloTreeSearchNode(state=initial_board_state)
     mcts = MonteCarloTreeSearch(root)
-    best_node = mcts.best_action(None, 10)
+    best_node = mcts.best_action(50)
     new_state = best_node.state
 
     def find_difference_between_boards(board1, board2):
@@ -130,5 +132,29 @@ def playGameComputerVsComputer():
     print(new_state.get_score())
 
 # generateGames()
-playGameHumanVsComputer()
+# playGameHumanVsComputer()
 #playGameHumanVsHuman()
+
+playGameComputerVsComputer()
+# size = 3
+# goInitialState = GoAPI(3)
+# state = GoGameState(state=goInitialState, next_to_move=goInitialState.currentPlayer)
+# state.move(GoMove(1, 1, state.next_to_move))
+# state.move(GoMove(1, 2, state.next_to_move))
+# state.move(GoMove(2, 1, state.next_to_move))
+#
+# encoded_state = state.get_encoded_state()
+# tensor_state = torch.tensor(encoded_state).unsqueeze(0).unsqueeze(0)
+# model = ResNet(state, 4, 64)
+# policy, value = model(tensor_state)
+# value = value.item()
+# print(policy)
+# policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
+#
+# print(value)
+#
+# print(state)
+# print(tensor_state)
+#
+# plt.bar(range(size * size), policy)
+# plt.show()
