@@ -2,7 +2,10 @@ import os
 import sys
 
 import numpy as np
+import torch
 from matplotlib import pyplot as plt
+
+from MCTS.Model import ResNet
 
 sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./MCTS'))
@@ -65,14 +68,25 @@ state = go.get_initial_state()
 # print(state)
 
 
-while state.is_game_over() == False:
-    print(state)
-    print()
-    mcts_probs = mcts.search(state)
-    action = np.argmax(mcts_probs)
-    plt.bar(range(size * size + 1), mcts_probs)
-    plt.show()
-    state = go.get_next_state(state, action, state.next_to_move)
+# while state.is_game_over() == False:
+#     print(state)
+#     print()
+#     mcts_probs = mcts.search(state)
+#     action = np.argmax(mcts_probs)
+#     plt.bar(range(size * size + 1), mcts_probs)
+#     plt.show()
+#     state = go.get_next_state(state, action, state.next_to_move)
 
+tensor_state = torch.tensor(state.board).unsqueeze(0).unsqueeze(0).float()
+model = ResNet(state, 4, 64)
+policy, value = model(tensor_state)
+value = value.item()
+policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
+
+print(policy)
+print(value)
+
+plt.bar(range(size * size + 1), policy)
+plt.show()
 
 
