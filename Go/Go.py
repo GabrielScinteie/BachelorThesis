@@ -108,6 +108,9 @@ class GoState:
     def __str__(self):
         return np.array2string(np.where(self.board == 1, 'X', np.where(self.board == 0, '.', '0')), separator='')
 
+    def get_changed_perspective(self):
+        return self.board * -1
+
     def get_score(self):
         return self.score
 

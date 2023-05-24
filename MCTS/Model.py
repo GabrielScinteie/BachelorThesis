@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 class ResNet(nn.Module):
     def __init__(self, game, num_resBlocks, num_hidden):
         super().__init__()
+
         self.startBlock = nn.Sequential(
             nn.Conv2d(1, num_hidden, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_hidden),
