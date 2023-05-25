@@ -3,47 +3,6 @@ from copy import deepcopy
 import numpy as np
 
 
-class TicTacToe:
-    def __init__(self):
-        self.row_count = 3
-        self.column_count = 3
-        self.action_size = self.row_count * self.column_count
-
-    def get_initial_state(self):
-        return np.zeros((self.row_count, self.column_count))
-
-    def get_next_state(self, state, action, player):
-        row = action // self.column_count
-        column = action % self.column_count
-        state[row, column] = player
-        return state
-
-    def get_valid_moves(self, state):
-        return (state.reshape(-1) == 0).astype(np.uint8)
-
-    def check_win(self, state, action):
-        row = action // self.column_count
-        column = action % self.column_count
-        player = state[row, column]
-
-        return (
-                np.sum(state[row, :]) == player * self.column_count
-                or np.sum(state[:, column]) == player * self.row_count
-                or np.sum(np.diag(state)) == player * self.row_count
-                or np.sum(np.diag(np.flip(state, axis=0))) == player * self.row_count
-        )
-
-    def get_value_and_terminated(self, state, action):
-        if self.check_win(state, action):
-            return 1, True
-        if np.sum(self.get_valid_moves(state)) == 0:
-            return 0, True
-        return 0, False
-
-    def get_opponent(self, player):
-        return -player
-
-
 class Go:
     def __init__(self, size):
         self.size = size
@@ -108,8 +67,13 @@ class GoState:
     def __str__(self):
         return np.array2string(np.where(self.board == 1, 'X', np.where(self.board == 0, '.', '0')), separator='')
 
-    def get_changed_perspective(self):
-        return self.board * -1
+    def get_reversed_perspective(self):
+        mask_1 = (self.board == 1)
+        mask_minus_1 = (self.board == -1)
+        copy_board = deepcopy(self.board)
+        copy_board[mask_1] = -1
+        copy_board[mask_minus_1] = 1
+        return copy_board
 
     def get_score(self):
         return self.score
@@ -248,8 +212,8 @@ class GoState:
                 move = GoMove(row, col, self.next_to_move)
                 if self.is_move_legal(move):
                     validMoves[row * self.size + col] = 1
-
-        validMoves[-1] = 1  # Pass
+        if np.sum(validMoves) == 0 or len(self.historyBoards) > self.size :
+            validMoves[-1] = 1  # Pass
         return validMoves
 
     def getTerritory(self, row, col, visited, numberIntersections, whiteNeighbors, blackNeighbors):

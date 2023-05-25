@@ -20,7 +20,7 @@ from Go.Node import Node
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-size = 3
+size = 5
 go = Go(size)
 state = go.get_initial_state()
 
@@ -62,12 +62,14 @@ state = go.get_initial_state()
 
 # Testare mcts pe un set de mutari
 state = go.get_next_state(state, 0, state.next_to_move)
-state = go.get_next_state(state, 1, state.next_to_move)
-state = go.get_next_state(state, 3, state.next_to_move)
-state = go.get_next_state(state, 4, state.next_to_move)
-state = go.get_next_state(state, 6, state.next_to_move)
-
-print(state)
+# state = go.get_next_state(state, 1, state.next_to_move)
+# state = go.get_next_state(state, 3, state.next_to_move)
+# state = go.get_next_state(state, 4, state.next_to_move)
+# state = go.get_next_state(state, 6, state.next_to_move)
+# state = go.get_next_state(state, 2, state.next_to_move)
+# state = go.get_next_state(state, 7, state.next_to_move)
+# state = go.get_next_state(state, 5, state.next_to_move)
+# print(state)
 # mcts_probs = mcts.search(state)
 # action = np.argmax(mcts_probs)
 #
@@ -87,38 +89,72 @@ print(state)
 #     plt.show()
 #     state = go.get_next_state(state, action, state.next_to_move)
 
-# Testare model chel
-# TODO board * -1 nu e bine deoarece 0 devine -0, ele nefiind egale
-tensor_state = torch.tensor(state.board * -1).unsqueeze(0).unsqueeze(0).float()
-model = ResNet(state, 4, 64)
-model.load_state_dict(torch.load('model_2.pt'))
-policy, value = model(tensor_state)
-value = value.item()
-policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
+# Learn
+device = torch.device("cpu")
+model = ResNet(go, 4, 64, device=device)
+#model.load_state_dict(torch.load('model_4.pt', map_location=device))
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+# num_iterations * num_selfPlay_iterations * nr_matari joc * num_searches = 3 * 20 * 100 = 6000
+args = {
+    'C': 2,
+    'num_searches': 20, # cate iteratii face algoritmul de MCTS
+    'num_iterations': 3,
+    'num_selfPlay_iterations': 20, # cate jocuri se joaca per iteratie
+    'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
+    'batch_size': 5 # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
+}
 
-print(policy)
-print(value)
+alphaZero = AlphaZero(model, optimizer, go, args)
+alphaZero.learn()
 
-plt.bar(range(size * size + 1), policy)
-plt.show()
-
-
-
-
-# Testat self play
-# model = ResNet(go, 4, 64)
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+# Testare
+# tensor_state = torch.tensor(state.get_reversed_perspective(), device=device).unsqueeze(0).unsqueeze(0).float()
+# model = ResNet(go, 4, 64, device)
+# model.load_state_dict(torch.load('model_4.pt', map_location=device))
+# policy, value = model(tensor_state)
+# value = value.item()
+# policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
+# valid_moves = go.get_valid_moves(state)
+# policy *= valid_moves
+# policy /= np.sum(policy)
+# print(policy)
+# print(value)
 #
-# args = {
-#     'C': 2,
-#     'num_searches': 60,
-#     'num_iterations': 3,
-#     'num_selfPlay_iterations': 10,
-#     'num_epochs': 4,
-#     'batch_size': 5
-# }
-#
-# alphaZero = AlphaZero(model, optimizer, go, args)
-# alphaZero.learn()
+# plt.bar(range(size * size + 1), policy)
+# plt.show()
+
+def computerVsComputer():
+    device = torch.device("cpu")
+    size = 3
+    go = Go(size)
+    model = ResNet(go, 4, 64, device)
+    model.load_state_dict(torch.load('model_4.pt', map_location=device))
+    state = go.get_initial_state()
+
+    while state.is_game_over() == False:
+        if state.next_to_move == -1:
+            tensor_state = torch.tensor(state.get_reversed_perspective(), device=device).unsqueeze(0).unsqueeze(0).float()
+        else:
+            tensor_state = torch.tensor(state.board, device=device).unsqueeze(0).unsqueeze(0).float()
+
+        policy, value = model(tensor_state)
+        value = value.item()
+        policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
+        valid_moves = go.get_valid_moves(state)
+        policy *= valid_moves
+        policy /= np.sum(policy)
+
+        action = np.argmax(policy)
+        print(f'Jucatorul {state.next_to_move} a facut miscarea {action}')
+        state = go.get_next_state(state, action, state.next_to_move)
+        print(state)
+        print()
+
+    print(go.get_value_and_terminated(state))
+
+# computerVsComputer()
+
+
+
 
 

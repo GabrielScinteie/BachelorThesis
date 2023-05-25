@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 
 
 class ResNet(nn.Module):
-    def __init__(self, game, num_resBlocks, num_hidden):
+    def __init__(self, game, num_resBlocks, num_hidden, device):
         super().__init__()
+        self.device = device
 
         self.startBlock = nn.Sequential(
             nn.Conv2d(1, num_hidden, kernel_size=3, padding=1),
@@ -33,6 +34,8 @@ class ResNet(nn.Module):
             nn.Linear(3 * game.size * game.size, 1),
             nn.Tanh()
         )
+
+        self.to(device)
 
     def forward(self, x):
         x = self.startBlock(x)

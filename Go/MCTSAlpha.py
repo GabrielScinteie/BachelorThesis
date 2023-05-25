@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from tqdm import trange
 
 from Go.NodeAlpha import NodeAlpha
 
@@ -14,7 +15,8 @@ class MCTSAlpha:
     def search(self, state):
         root = NodeAlpha(self.game, self.args, state)
 
-        for search in range(self.args['num_searches']):
+        for search in trange(self.args['num_searches']):
+            # print(f'Search no. {search}')
             # print(f'Simularea numarul {search}')
             node = root
             # Traverse the tree by choosing the child with best UCB score at any point until I reach a node that hasn't been fully expanded
@@ -23,19 +25,25 @@ class MCTSAlpha:
 
             # We check if we reached a terminal state
             value, score, is_terminal = self.game.get_value_and_terminated(node.state)
-            # If the state is terminal then we have to change sign of value because the value is for the opponent player TODO WHY?
+
             if is_terminal:
+                # Daca in root albul muta si castiga albul => proprag 1
+                # Daca in root albul muta si castiga negrul => proprag -1
+                # Daca in root negrul muta si castiga negrul => propag 1
+                # Daca in root negrul muta si castiga negrul => propag -1
                 if value != root.state.next_to_move:
-                    value *= -1
+                    value = -1
+                else:
+                    value = 1
             else:
                 # If the state is not terminal, then we expand it by taking a random action, then we simulate
                 # TODO de inteles de ce pun squeeze si unsqueeze
-                neutral_state_perspective = node.state
+                neutral_state_board = node.state.board
                 if node.state.next_to_move == -1:
-                    neutral_state_perspective.board *= -1
+                    neutral_state_board = node.state.get_reversed_perspective()
 
                 policy, value = self.model(
-                    torch.tensor(node.state.board).unsqueeze(0).unsqueeze(0).float()
+                    torch.tensor(neutral_state_board, device=self.model.device).unsqueeze(0).unsqueeze(0).float()
                 )
 
                 policy = torch.softmax(policy, axis=1).squeeze(0).cpu().numpy()
