@@ -15,7 +15,8 @@ class MCTSAlpha:
     def search(self, state):
         root = NodeAlpha(self.game, self.args, state)
 
-        for search in trange(self.args['num_searches']):
+        for search in range(self.args['num_searches']):
+            # print(search)
             # print(f'Search no. {search}')
             # print(f'Simularea numarul {search}')
             node = root
@@ -36,7 +37,6 @@ class MCTSAlpha:
                 else:
                     value = 1
             else:
-                # If the state is not terminal, then we expand it by taking a random action, then we simulate
                 # TODO de inteles de ce pun squeeze si unsqueeze
                 neutral_state_board = node.state.board
                 if node.state.next_to_move == -1:

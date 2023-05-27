@@ -62,7 +62,7 @@ class GoState:
         self.next_to_move = self.players[0]
         self.consecutive_pass = 0
         self.captured_stones = {self.players[0]: [], self.players[1]: []}
-        self.historyBoards = []
+        self.history_boards = []
 
     def __str__(self):
         return np.array2string(np.where(self.board == 1, 'X', np.where(self.board == 0, '.', '0')), separator='')
@@ -197,8 +197,12 @@ class GoState:
         else:
             self.board[row][col] = player
             self.tryCapture(self.board, self.captured_stones, row, col, player)
-            self.historyBoards.append(deepcopy(self.board))
-            self.consecutivePass = 0
+            self.history_boards.append(deepcopy(self.board))
+            self.consecutive_pass = 0
+
+        # Limita de miscari
+        if len(self.history_boards) > self.size * self.size * 3:
+            self.running = False
 
         self.next_to_move = self.getOppositePlayer(self.next_to_move)
 
@@ -212,7 +216,7 @@ class GoState:
                 move = GoMove(row, col, self.next_to_move)
                 if self.is_move_legal(move):
                     validMoves[row * self.size + col] = 1
-        if np.sum(validMoves) == 0 or len(self.historyBoards) > self.size :
+        if np.sum(validMoves) == 0 or len(self.history_boards) > self.size * self.size:
             validMoves[-1] = 1  # Pass
         return validMoves
 
@@ -280,7 +284,7 @@ class GoState:
         return hasLiberties
 
     def respectsKoRule(self, new_board):
-        for previousBoard in self.historyBoards:
+        for previousBoard in self.history_boards:
             # print('Board vechi: ')
             # printBoard(previousBoard, self.size)
             # printBoard(new_board, self.size)

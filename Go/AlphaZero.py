@@ -1,62 +1,85 @@
+import os
 import random
+import time
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+import torch.multiprocessing as mp
+import pickle
 from tqdm import trange
 
 from Go.MCTSAlpha import MCTSAlpha
 
 
 class AlphaZero:
-    def __init__(self, model, optimizer, game, args):
+    def __init__(self, model, optimizer, game, args, dataset_self_play_storage_path):
         self.model = model
         self.optimizer = optimizer
         self.game = game
         self.args = args
         self.mcts = MCTSAlpha(game, args, model)
+        self.mean_length_self_play = 0
+        self.sp_folder_path = dataset_self_play_storage_path
 
-    def selfPlay(self):
-        memory = []
-        state = self.game.get_initial_state()
-        while True:
+    def save_as_pickle(self, filename, data):
+        folder_name = self.sp_folder_path + '/' + filename
+        with open(folder_name, 'wb') as f:
+            pickle.dump(data, f)
 
-            action_probs = self.mcts.search(state)
+    def load_pickle(self, filename):
+        folder_name = self.sp_folder_path + '/' + filename
+        with open(folder_name, 'rb') as f:
+            data = pickle.load(f)
+        return data
 
-            memory.append((state, action_probs, state.next_to_move))
+    def selfPlay(self, process_number, number_games):
+        self_play_records = []
 
-            action = np.random.choice(self.game.action_size, p=action_probs)
+        for i in range(number_games):
+            state = self.game.get_initial_state()
+            memory = []
+            game_length = 0
+            while True:
+                game_length += 1
+                # print(len(state.history_boards))
+                action_probs = self.mcts.search(state)
 
-            state = self.game.get_next_state(state, action, state.next_to_move)
+                memory.append((state, action_probs, state.next_to_move))
 
-            value, _, is_terminal = self.game.get_value_and_terminated(state)
+                action = np.random.choice(self.game.action_size, p=action_probs)
 
-            if is_terminal:
-                returnMemory = []
-                for hist_state, hist_action_probs, hist_player in memory:
-                    # If player X has to move but the state is terminal TODO cum stochez cine a castigat din starea din trecut?
-                    hist_board = hist_state.board
-                    hist_outcome = value
+                state = self.game.get_next_state(state, action, state.next_to_move)
 
-                    if hist_player == -1:
-                        hist_board = hist_state.get_reversed_perspective()
-                        hist_outcome *= -1
+                value, _, is_terminal = self.game.get_value_and_terminated(state)
 
-                    # Stare s, alb la mutare, alb castiga => value = -1. Board-ul trebuie inversat, deci si value = 1
-                    # Stare s, alb la mutare, alb pierde => value = 1. Board-ul trebuie inversat, deci si value = -1
-                    # Stare s, negru la mutare, negru castiga => value = 1
-                    # Stare s, negru la mutare, negru pierde => value = -1
-                    returnMemory.append((
-                        hist_board,
-                        hist_action_probs,
-                        hist_outcome
-                    ))
+                if is_terminal:
+                    print(game_length)
+                    for hist_state, hist_action_probs, hist_player in memory:
+                        hist_board = hist_state.board
+                        hist_outcome = value
 
-                # print('Lungime joc self-play: ' + str(len(returnMemory)))
-                return returnMemory
+                        if hist_player == -1:
+                            hist_board = hist_state.get_reversed_perspective()
+                            hist_outcome *= -1
+
+                        # Stare s, alb la mutare, alb castiga => value = -1. Board-ul trebuie inversat, deci si value = 1
+                        # Stare s, alb la mutare, alb pierde => value = 1. Board-ul trebuie inversat, deci si value = -1
+                        # Stare s, negru la mutare, negru castiga => value = 1
+                        # Stare s, negru la mutare, negru pierde => value = -1
+
+                        self_play_records.append((
+                            hist_board,
+                            hist_action_probs,
+                            hist_outcome
+                        ))
+                    break
+
+                    # print('Lungime joc self-play: ' + str(len(returnMemory)))
+        file_name = f'Process_{process_number}'
+        self.save_as_pickle(file_name, self_play_records)
 
     def train(self, memory):
-        # TODO de inteles, copy paste
         random.shuffle(memory)
         for batchIdx in range(0, len(memory), self.args['batch_size']):
             sample = memory[batchIdx:batchIdx+self.args['batch_size']]  # Change to memory[batchIdx:batchIdx+self.args['batch_size']] in case of an error
@@ -80,13 +103,31 @@ class AlphaZero:
             self.optimizer.step()  # change to self.optimizer
 
     def learn(self):
+        # f = open('mean_games_length.txt', 'a')
         for iteration in range(self.args['num_iterations']):
+            # self.mean_length_self_play = 0
             memory = []
 
             self.model.eval()
-            for selfPlay_iteration in trange(self.args['num_selfPlay_iterations']):
-                # print(f'Selfplay no. {selfPlay_iteration}')
-                memory += self.selfPlay()
+
+            processes = []
+            sp_games_per_process = self.args['num_selfPlay_iterations'] // self.args['num_processes']
+            for process_number in range(self.args['num_processes']):
+                # print(f'\nSelfplay no. {selfPlay_iteration}')
+                p = mp.Process(target=self.selfPlay, args=(process_number, sp_games_per_process))
+                p.start()
+                processes.append(p)
+
+            for p in processes:
+                p.join()
+
+            for i in range(self.args['num_processes']):
+                file_name = f'Process_{i}'
+                memory.extend(self.load_pickle(file_name))
+            print('Marime memorie(ar trebui sa fie 10' + str(len(memory)))
+            # self.mean_length_self_play /= self.args['num_selfPlay_iterations']
+
+            # f.write(f'Iteratia {iteration}: ' + str(self.mean_length_self_play))
 
             if iteration == self.args['num_iterations'] - 1:
                 self.save_memory_in_file(memory)
@@ -97,6 +138,7 @@ class AlphaZero:
 
             torch.save(self.model.state_dict(), f"model_{iteration}.pt")
             torch.save(self.optimizer.state_dict(), f"optimizer_{iteration}.pt")
+        # f.close()
 
     def save_memory_in_file(self, memory):
         f = open('memory.txt', 'a')
