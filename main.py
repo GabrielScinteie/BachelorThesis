@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from matplotlib import pyplot as plt
 
+from Arena import Arena
 from Go.AlphaZero import AlphaZero
 from Go.MCTSAlpha import MCTSAlpha
 from MCTS.Model import ResNet
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     # print(go.get_value_and_terminated(state))
 
     # Testare mcts pe un set de mutari
-    state = go.get_next_state(state, 0, state.next_to_move)
+    # state = go.get_next_state(state, 0, state.next_to_move)
     # state = go.get_next_state(state, 1, state.next_to_move)
     # state = go.get_next_state(state, 3, state.next_to_move)
     # state = go.get_next_state(state, 4, state.next_to_move)
@@ -68,38 +69,56 @@ if __name__ == '__main__':
     # state = go.get_next_state(state, action, state.next_to_move)
     # print(state)
 
-    # JucatMCTS
-    # model = ResNet(state, 4, 64)
-    # mctsAlpha = MCTSAlpha(go, args, model)
-    #
-    # while state.is_game_over() == False:
-    #     print(state)
-    #     print()
-    #     mcts_probs = mctsAlpha.search(state)
-    #     action = np.argmax(mcts_probs)
-    #     plt.bar(range(size * size + 1), mcts_probs)
-    #     plt.show()
-    #     state = go.get_next_state(state, action, state.next_to_move)
-
     # Learn
-    device = torch.device("cpu")
-    model = ResNet(go, 4, 64, device=device)
-    #model.load_state_dict(torch.load('model_4.pt', map_location=device))
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    # num_iterations * num_selfPlay_iterations * nr_matari joc * num_searches = 3 * 20 * 100 = 6000
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = ResNet(go, 4, 128, device=device)
+    # model.load_state_dict(torch.load('learning_results2/model_2.pt', map_location=device))
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0001)
+    # optimizer.load_state_dict(torch.load('learning_results2/optimizer_2.pt', map_location=device))
+
+    # num_iterations * num_selfPlay_iterations * nr_mutari joc * num_searches = 3 * 20 * 100 = 6000
+
     args = {
         'C': 2,
-        'num_searches': 30, # cate iteratii face algoritmul de MCTS
-        'num_iterations': 1,
-        'num_selfPlay_iterations': 10, # cate jocuri se joaca per iteratie
+        'num_searches': 5 * 5 * 2, # cate iteratii face algoritmul de MCTS
+        'num_iterations': 100,
+        'num_selfPlay_iterations': 60, # cate jocuri se joaca per iteratie
         'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
-        'batch_size': 20, # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
-        'num_processes': 5
+        'batch_size': 128, # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
+        'num_processes': 6,
+        'temperature': 1,
+        'dirichlet_eps': 0.3,
+        'dirichlet_alpha': 0.03
     }
 
     dataset_path = 'dataset'
-    alphaZero = AlphaZero(model, optimizer, go, args, dataset_path)
+    arena = Arena(go, args)
+    alphaZero = AlphaZero(model, optimizer, go, args, dataset_path, arena)
+    # TODO vezi cum faci sa poti vedea un exemplu de joc ca sa-l analizezi
+    # TODO vezi daca e rentabil sa nu mai salvezi iteratiile care nu au updatat
+    # TODO incearca sa adaugi mai multe canale ca sa usurezi treaba algoritmului
+    #   EXEMPLU: canal 1: valoare booleana pentru piesele tale
+    #            canal 2: valoare booleana pentru piesele inamicului
+    #              OPTIONAL: Canal plin de 1 sau 0 pt a explica regula komi alroitmlui
+
+    # TODO de facut o statistica daca castiga mai des albul sau negrul
     alphaZero.learn()
+
+    # arena = Arena(go)
+    # models_folder_path = ''
+    # for i in range(0, 10):
+    #     for j in range(0, 10):
+    #         if i != j:
+    #             model1 = ResNet(go, 4, 64, device=device)
+    #             model2 = ResNet(go, 4, 64, device=device)
+    #
+    #             model1.load_state_dict(torch.load(models_folder_path + 'model_' + str(i) + '.pt', map_location=device))
+    #             model2.load_state_dict(torch.load(models_folder_path + 'model_' + str(j) + '.pt', map_location=device))
+    #
+    #             optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
+    #             optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
+    #
+    #             arena.play(model1, model2, 'model_' + str(i), 'model_' + str(j), 100, 'arena_results.txt')
 
     # Testare
     # tensor_state = torch.tensor(state.get_reversed_perspective(), device=device).unsqueeze(0).unsqueeze(0).float()

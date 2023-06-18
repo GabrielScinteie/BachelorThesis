@@ -1,3 +1,4 @@
+import copy
 from copy import deepcopy
 
 import numpy as np
@@ -18,7 +19,7 @@ class Go:
             row = action // self.size
             column = action % self.size
 
-        newState = deepcopy(state)
+        newState = state.deep_copy()
         newState.move(GoMove(row, column, player))
 
         return newState
@@ -62,10 +63,22 @@ class GoState:
         self.next_to_move = self.players[0]
         self.consecutive_pass = 0
         self.captured_stones = {self.players[0]: [], self.players[1]: []}
-        self.history_boards = []
+        self.no_moves = 0
+        self.last_board = None
 
     def __str__(self):
         return np.array2string(np.where(self.board == 1, 'X', np.where(self.board == 0, '.', '0')), separator='')
+
+    def deep_copy(self):
+        # Shallow copy the entire object
+        copied_state = copy.copy(self)
+
+        # Deep copy the mutable fields
+        copied_state.board = copy.deepcopy(self.board)
+        copied_state.captured_stones = copy.deepcopy(self.captured_stones)
+        copied_state.last_board = copy.deepcopy(self.last_board)
+
+        return copied_state
 
     def get_reversed_perspective(self):
         mask_1 = (self.board == 1)
@@ -186,6 +199,7 @@ class GoState:
         return False
 
     def move(self, move):
+        self.no_moves += 1
         row = move.row
         col = move.column
         player = move.player
@@ -195,13 +209,13 @@ class GoState:
             if self.consecutive_pass == 2:
                 self.running = False
         else:
+            self.last_board = deepcopy(self.board)
             self.board[row][col] = player
             self.tryCapture(self.board, self.captured_stones, row, col, player)
-            self.history_boards.append(deepcopy(self.board))
             self.consecutive_pass = 0
 
         # Limita de miscari
-        if len(self.history_boards) > self.size * self.size * 3:
+        if self.no_moves > self.size * self.size * 3:
             self.running = False
 
         self.next_to_move = self.getOppositePlayer(self.next_to_move)
@@ -216,7 +230,7 @@ class GoState:
                 move = GoMove(row, col, self.next_to_move)
                 if self.is_move_legal(move):
                     validMoves[row * self.size + col] = 1
-        if np.sum(validMoves) == 0 or len(self.history_boards) > self.size * self.size:
+        if np.sum(validMoves) == 0 or self.no_moves > self.size * self.size / 2:
             validMoves[-1] = 1  # Pass
         return validMoves
 
@@ -284,14 +298,9 @@ class GoState:
         return hasLiberties
 
     def respectsKoRule(self, new_board):
-        for previousBoard in self.history_boards:
-            # print('Board vechi: ')
-            # printBoard(previousBoard, self.size)
-            # printBoard(new_board, self.size)
-            # print()
-            if str(new_board) == str(previousBoard):
-                # print('Nu se respecta regula Ko')
-                return False
+        if str(new_board) == str(self.last_board):
+            # print('Nu se respecta regula Ko')
+            return False
 
         # print('Regula Ko este respectata')
         return True

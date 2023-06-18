@@ -1,7 +1,5 @@
 from torch import nn
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-
 
 class ResNet(nn.Module):
     def __init__(self, game, num_resBlocks, num_hidden, device):

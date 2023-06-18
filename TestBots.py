@@ -6,58 +6,67 @@ from Go.AlphaZero import AlphaZero
 from Go.Go import Go
 from MCTS.Model import ResNet
 
-size = 5
-go = Go(size)
-arena = Arena(go)
+if __name__ == '__main__':
+    args = {
+        'C': 2,
+        'num_searches': 3 * 3 * 3,  # cate iteratii face algoritmul de MCTS
+        'num_iterations': 100,
+        'num_selfPlay_iterations': 105,  # cate jocuri se joaca per iteratie
+        'num_epochs': 10,  # cate epoci de antrenare se intampla per iteratie
+        'batch_size': 64,  # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
+        'num_processes': 2,
+        'temperature': 1,
+        'dirichlet_eps': 0.3,
+        'dirichlet_alpha': 0.03
+    }
 
-device = torch.device("cpu")
-model8 = ResNet(go, 4, 64, device=device)
-model9 = ResNet(go, 4, 64, device=device)
+    size = 3
+    go = Go(size)
 
-models_folder_path = './saved_model/size5/run1/'
-model8.load_state_dict(torch.load('./saved_model/size5/run1/model_8.pt', map_location=device))
-model9.load_state_dict(torch.load('./saved_model/size5/run1/model_9.pt', map_location=device))
+    arena = Arena(go, args)
 
-optimizer8 = torch.optim.Adam(model8.parameters(), lr=0.001)
-optimizer9 = torch.optim.Adam(model9.parameters(), lr=0.001)
+    device = torch.device("cpu")
 
-# os.remove('arena_results.txt')
-#
-# for i in range(3, 10):
-#     for j in range(3, 10):
-#         if i != j:
-#             model1 = ResNet(go, 4, 64, device=device)
-#             model2 = ResNet(go, 4, 64, device=device)
-#
-#             model1.load_state_dict(torch.load(models_folder_path + 'model_'+str(i)+'.pt', map_location=device))
-#             model2.load_state_dict(torch.load(models_folder_path + 'model_'+str(j)+'.pt', map_location=device))
-#
-#             optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
-#             optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
-#
-#             arena.play(model1, model2, 'model_'+str(i), 'model_'+str(j), 20, 'arena_results.txt')
+    # os.remove('arena_results.txt')
+    # models_folder_path = ''
+    # for i in range(0, 100):
+    #     for j in range(i + 1, 100):
+    #         if i != j:
+    #             model1 = ResNet(go, 4, 128, device=device)
+    #             model2 = ResNet(go, 4, 128, device=device)
+    #
+    #             model1.load_state_dict(torch.load(models_folder_path + 'model_'+str(i)+'.pt', map_location=device))
+    #             model2.load_state_dict(torch.load(models_folder_path + 'model_'+str(j)+'.pt', map_location=device))
+    #
+    #             optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
+    #             optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
+    #
+    #             arena.play(model1, model2, 'model_'+str(i), 'model_'+str(j), 100, 'arena_results.txt')
 
-state = go.get_initial_state()
+    model1 = ResNet(go, 4, 128, device=device)
+    model2 = ResNet(go, 4, 128, device=device)
 
-# SELFPLAY FUNCTIONEAZA CORECT
-# device = torch.device("cpu")
-# model = ResNet(go, 4, 64, device=device)
-# #model.load_state_dict(torch.load('model_4.pt', map_location=device))
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-# # num_iterations * num_selfPlay_iterations * nr_matari joc * num_searches = 3 * 20 * 100 = 6000
-# args = {
-#     'C': 2,
-#     'num_searches': 5, # cate iteratii face algoritmul de MCTS
-#     'num_iterations': 10,
-#     'num_selfPlay_iterations': 30, # cate jocuri se joaca per iteratie
-#     'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
-#     'batch_size': 20 # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
-# }
+    model1.load_state_dict(torch.load('learning_results2/model_0.pt', map_location=device))
+    model2.load_state_dict(torch.load('learning_results2/model_19.pt', map_location=device))
 
-# alphaZero = AlphaZero(model, optimizer, go, args)
-# memory = alphaZero.selfPlay()
-# for elem in memory:
-#     state, prob, result = elem
-#     print(state)
-#     print(result)
-#     print()
+    # optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
+    # optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
+
+    arena.play(model1, model2, 'model_0', 'model4', 4, 'arena_results.txt')
+
+    # state = go.get_initial_state()
+
+    # SELFPLAY FUNCTIONEAZA CORECT
+    # device = torch.device("cpu")
+    # model = ResNet(go, 4, 64, device=device)
+    #model.load_state_dict(torch.load('model_4.pt', map_location=device))
+    # optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    # # num_iterations * num_selfPlay_iterations * nr_matari joc * num_searches = 3 * 20 * 100 = 6000
+
+    # alphaZero = AlphaZero(model, optimizer, go, args)
+    # memory = alphaZero.selfPlay()
+    # for elem in memory:
+    #     state, prob, result = elem
+    #     print(state)
+    #     print(result)
+    #     print()
