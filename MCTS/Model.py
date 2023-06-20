@@ -17,19 +17,21 @@ class ResNet(nn.Module):
         )
 
         self.policyHead = nn.Sequential(
-            nn.Conv2d(num_hidden, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(num_hidden, 2, kernel_size=1, stride=1),
+            nn.BatchNorm2d(2),
             nn.ReLU(),
             nn.Flatten(),
-            nn.Linear(32 * game.size * game.size, game.size * game.size + 1)
+            nn.Linear(2 * game.size * game.size, game.size * game.size + 1)
         )
 
         self.valueHead = nn.Sequential(
-            nn.Conv2d(num_hidden, 3, kernel_size=3, padding=1),
-            nn.BatchNorm2d(3),
+            nn.Conv2d(num_hidden, 1, kernel_size=1, stride=1),
+            nn.BatchNorm2d(1),
             nn.ReLU(),
             nn.Flatten(),
-            nn.Linear(3 * game.size * game.size, 1),
+            nn.Linear(game.size * game.size, 256),
+            nn.ReLU(),
+            nn.Linear(256, 1),
             nn.Tanh()
         )
 

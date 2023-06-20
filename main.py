@@ -71,21 +71,21 @@ if __name__ == '__main__':
 
     # Learn
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = ResNet(go, 4, 128, device=device)
-    # model.load_state_dict(torch.load('learning_results2/model_2.pt', map_location=device))
+    model = ResNet(go, 4, 256, device=device)
+    model.load_state_dict(torch.load('learning_results3/model_3.pt', map_location=device))
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0001)
-    # optimizer.load_state_dict(torch.load('learning_results2/optimizer_2.pt', map_location=device))
+    optimizer.load_state_dict(torch.load('learning_results3/optimizer_3.pt', map_location=device))
 
     # num_iterations * num_selfPlay_iterations * nr_mutari joc * num_searches = 3 * 20 * 100 = 6000
 
     args = {
         'C': 2,
-        'num_searches': 5, # cate iteratii face algoritmul de MCTS
+        'num_searches': 5 * 5 * 3, # cate iteratii face algoritmul de MCTS
         'num_iterations': 100,
-        'num_selfPlay_iterations': 4, # cate jocuri se joaca per iteratie
+        'num_selfPlay_iterations': 96, # cate jocuri se joaca per iteratie
         'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
         'batch_size': 128, # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
-        'num_processes': 2,
+        'num_processes': 6,
         'temperature': 1,
         'dirichlet_eps': 0.3,
         'dirichlet_alpha': 0.03
