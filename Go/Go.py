@@ -1,6 +1,5 @@
 import copy
 from copy import deepcopy
-
 import numpy as np
 
 
@@ -19,17 +18,15 @@ class Go:
             row = action // self.size
             column = action % self.size
 
-        newState = state.deep_copy()
-        newState.move(GoMove(row, column, player))
+        new_state = state.deep_copy()
+        new_state.move(GoMove(row, column, player))
 
-        return newState
+        return new_state
 
     def get_valid_moves(self, state):
         return state.get_legal_actions()
 
     def get_value_and_terminated(self, state):
-        # TODO nu sunt sigur de state.next_to_move aici
-
         if state.is_game_over() == True:
             # Exemplu output: True, 1, [15.5, 12]
             return state.game_result, state.get_score(), True
@@ -91,62 +88,48 @@ class GoState:
     def get_score(self):
         return self.score
 
-    # def _convert_board_to_numbers(self):
-    #     converted_matrix = []
-    #     char_to_val = {'X': 1.0, '.': 0.0, 'O': -1.0}
-    #     for row in self.board:
-    #         converted_row = [char_to_val[char] for char in row]
-    #         converted_matrix.append(converted_row)
-    #
-    #     return converted_matrix
-    #
-    # def get_encoded_state(self):
-    #     encoded_state = self._convert_board_to_numbers()
-    #     return encoded_state
-
     @property
     def game_result(self):
         # Returns 1 if black won and -1 if white won
-        whiteScore = self.komi
-        blackScore = 0
+        white_score = self.komi
+        black_score = 0
 
-        capturedStonesByWhite = len(self.captured_stones[-1])
-        capturedStonesByBlack = len(self.captured_stones[1])
+        captured_stones_by_white = len(self.captured_stones[-1])
+        captured_stones_by_black = len(self.captured_stones[1])
 
-        whiteTerritory = 0
-        blackTerritory = 0
+        white_territory = 0
+        black_territory = 0
 
         visited = []
 
         for i in range(self.size):
             for j in range(self.size):
                 if self.board[i][j] == 1:
-                    blackScore += 1
+                    black_score += 1
                 if self.board[i][j] == -1:
-                    whiteScore += 1
+                    white_score += 1
                 if self.board[i][j] == 0 and (i, j) not in visited:
-                    numberIntersections, whiteNeighbors, blackNeighbors = self.getTerritory(i, j, visited, 0, 0, 0)
-                    # print(f'Grupul ce-l contine pe {i} {j} are {whiteNeighbors} vecini albi, {blackNeighbors} vecini negri si are {numberIntersections} elemente')
-                    if whiteNeighbors == 0:
-                        # print(f'{numberIntersections} puncte pentru negru')
-                        blackTerritory += numberIntersections
-                    if blackNeighbors == 0:
-                        # print(f'{numberIntersections} puncte pentru alb')
-                        whiteTerritory += numberIntersections
+                    number_intersections, white_neighbors, black_neighbors = self.get_territory(i, j, visited, 0, 0, 0)
+                    # print(f'Grupul ce-l contine pe {i} {j} are {white_neighbors} vecini albi, {black_neighbors} vecini negri si are {number_intersections} elemente')
+                    if white_neighbors == 0:
+                        # print(f'{number_intersections} puncte pentru negru')
+                        black_territory += number_intersections
+                    if black_neighbors == 0:
+                        # print(f'{number_intersections} puncte pentru alb')
+                        white_territory += number_intersections
 
-        # print(f'Black has captured {capturedStonesByBlack} stones and has {blackTerritory} territory points')
-        # print(f'White has captured {capturedStonesByWhite} stones and has {whiteTerritory} territory points')
-        blackScore += capturedStonesByBlack + blackTerritory
-        whiteScore += capturedStonesByWhite + whiteTerritory
-        self.score = [blackScore, whiteScore]
+        # print(f'Black has captured {captured_stones_by_black} stones and has {black_territory} territory points')
+        # print(f'White has captured {captured_stones_by_white} stones and has {white_territory} territory points')
+        black_score += captured_stones_by_black + black_territory
+        white_score += captured_stones_by_white + white_territory
+        self.score = [black_score, white_score]
 
-        # print(f'Black: {blackScore}, White: {whiteScore}')
-        if blackScore > whiteScore:
+        # print(f'Black: {black_score}, White: {white_score}')
+        if black_score > white_score:
             return 1
         return -1
 
     def is_game_over(self):
-        # TODO nu sunt sigur ca e bine
         return self.running == False
 
     def is_move_legal(self, move):
@@ -164,36 +147,36 @@ class GoState:
 
         # Verific daca ultima piesa adaugata captureaza piese ale inamicului, pentru ca in acest caz ultima piesa
         # adaugata are cu siguranta cel putin o libertate
-        visitedIntersections = []
+        visited_intersections = []
 
-        oppositePlayer = self.getOppositePlayer(player)
+        opposite_player = self.get_opposite_player(player)
 
-        neighbors = self.getValidNeighbours(row, column)
-        hasLiberty = False
+        neighbors = self.get_valid_neighbours(row, column)
+        has_liberty = False
         for neighbor in neighbors:
             i = neighbor[0]
             j = neighbor[1]
-            if new_board[i][j] == oppositePlayer and (i, j) not in visitedIntersections:
-                groupStones = []
+            if new_board[i][j] == opposite_player and (i, j) not in visited_intersections:
+                group_stones = []
                 visited = []
-                enemyGroupLiberty = self.hasLiberty(new_board, i, j, visited, groupStones, oppositePlayer)
-                visitedIntersections.extend(visited)
+                enemy_group_liberty = self.has_liberty(new_board, i, j, visited, group_stones, opposite_player)
+                visited_intersections.extend(visited)
                 # Daca grupul inamic nu are libertati, atunci mutarea este cu siguranta una valida
-                if not enemyGroupLiberty:
-                    hasLiberty = True
+                if not enemy_group_liberty:
+                    has_liberty = True
 
         # Verific daca grupul creat de adaugarea ultimei pietre are libertati
-        if self.hasLiberty(new_board, row, column, [], [], player):
-            hasLiberty = True
+        if self.has_liberty(new_board, row, column, [], [], player):
+            has_liberty = True
 
-        self.tryCapture(new_board,
-                        {self.players[0]: [], self.players[1]: []},
-                        row,
-                        column,
-                        player
-                        )
+        self.try_capture(new_board,
+                         {self.players[0]: [], self.players[1]: []},
+                         row,
+                         column,
+                         player
+                         )
 
-        if hasLiberty and self.respectsKoRule(new_board):
+        if has_liberty and self.respects_ko_rule(new_board):
             return True
 
         return False
@@ -211,61 +194,61 @@ class GoState:
         else:
             self.last_board = deepcopy(self.board)
             self.board[row][col] = player
-            self.tryCapture(self.board, self.captured_stones, row, col, player)
+            self.try_capture(self.board, self.captured_stones, row, col, player)
             self.consecutive_pass = 0
 
         # Limita de miscari
         if self.no_moves > self.size * self.size * 3:
             self.running = False
 
-        self.next_to_move = self.getOppositePlayer(self.next_to_move)
+        self.next_to_move = self.get_opposite_player(self.next_to_move)
 
         return self
 
     def get_legal_actions(self):
-        validMoves = np.zeros(self.size * self.size + 1)
+        valid_moves = np.zeros(self.size * self.size + 1)
 
         for row in range(self.size):
             for col in range(self.size):
                 move = GoMove(row, col, self.next_to_move)
                 if self.is_move_legal(move):
-                    validMoves[row * self.size + col] = 1
-        if np.sum(validMoves) == 0 or self.no_moves > self.size * self.size / 2:
-            validMoves[-1] = 1  # Pass
-        return validMoves
+                    valid_moves[row * self.size + col] = 1
+        if np.sum(valid_moves) == 0 or self.no_moves > self.size * self.size / 2:
+            valid_moves[-1] = 1  # Pass
+        return valid_moves
 
-    def getTerritory(self, row, col, visited, numberIntersections, whiteNeighbors, blackNeighbors):
-        # print(f'Sunt in getTerritory si testez pozitia ({row}, {col})')
+    def get_territory(self, row, col, visited, number_intersections, white_neighbors, black_neighbors):
+        # print(f'Sunt in get_territory si testez pozitia ({row}, {col})')
         if (row, col) in visited:
-            return numberIntersections, whiteNeighbors, blackNeighbors
+            return number_intersections, white_neighbors, black_neighbors
 
         # print('Incrementez numarul de intersectii')
         visited.append((row, col))
 
         # Teritoriul are cel putin o intersectie libera, piesa de pe pozitia curenta
-        numberIntersections += 1
+        number_intersections += 1
 
         neighbors = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
 
         # Parcurg toti cei 4 vecini
         for neighbor in neighbors:
-            newRow = neighbor[0]
-            newCol = neighbor[1]
+            new_row = neighbor[0]
+            new_col = neighbor[1]
 
-            if 0 <= newRow < self.size and 0 <= newCol < self.size and (newRow, newCol) not in visited:
-                if self.board[newRow][newCol] == 0:
-                    numberIntersections, whiteNeighbors, blackNeighbors = self.getTerritory(newRow, newCol, visited,
-                                                                                            numberIntersections,
-                                                                                            whiteNeighbors,
-                                                                                            blackNeighbors)
-                elif self.board[newRow][newCol] == 1:
-                    blackNeighbors += 1
-                elif self.board[newRow][newCol] == -1:
-                    whiteNeighbors += 1
+            if 0 <= new_row < self.size and 0 <= new_col < self.size and (new_row, new_col) not in visited:
+                if self.board[new_row][new_col] == 0:
+                    number_intersections, white_neighbors, black_neighbors = self.get_territory(new_row, new_col, visited,
+                                                                                                number_intersections,
+                                                                                                white_neighbors,
+                                                                                                black_neighbors)
+                elif self.board[new_row][new_col] == 1:
+                    black_neighbors += 1
+                elif self.board[new_row][new_col] == -1:
+                    white_neighbors += 1
 
-        return numberIntersections, whiteNeighbors, blackNeighbors
+        return number_intersections, white_neighbors, black_neighbors
 
-    def hasLiberty(self, new_board, row, col, visited, groupStones, player):
+    def has_liberty(self, new_board, row, col, visited, group_stones, player):
         # Daca am vizitat deja acest nod
         if (row, col) in visited:
             return False
@@ -274,30 +257,30 @@ class GoState:
         visited.append((row, col))
 
         # Adaug nodul curent la grupul actual
-        groupStones.append((row, col))
+        group_stones.append((row, col))
 
         neighbors = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
-        hasLiberties = False
+        has_liberties = False
 
         # Parcurg toti cei 4 vecini
         for neighbor in neighbors:
-            newRow = neighbor[0]
-            newCol = neighbor[1]
+            new_row = neighbor[0]
+            new_col = neighbor[1]
             # Daca vecinii sunt in interiorul tablei
-            if 0 <= newRow < self.size and 0 <= newCol < self.size:
+            if 0 <= new_row < self.size and 0 <= new_col < self.size:
                 # Daca vecinul este o piesa care apartine playerului curent, atunci apelez getGroup de vecin
-                if new_board[newRow][newCol] == player:
-                    # print(f'Verific daca vecinul ({newRow}, {newCol}) are libertati')
-                    hasLiberties = hasLiberties or self.hasLiberty(new_board, newRow, newCol, visited, groupStones,
-                                                                   player)
+                if new_board[new_row][new_col] == player:
+                    # print(f'Verific daca vecinul ({new_row}, {new_col}) are libertati')
+                    has_liberties = has_liberties or self.has_liberty(new_board, new_row, new_col, visited, group_stones,
+                                                                    player)
 
                 # Daca vecinul este un spatiu gol, atunci grupul are cel putin o libertate
-                elif new_board[newRow][newCol] == 0:
-                    hasLiberties = True
+                elif new_board[new_row][new_col] == 0:
+                    has_liberties = True
 
-        return hasLiberties
+        return has_liberties
 
-    def respectsKoRule(self, new_board):
+    def respects_ko_rule(self, new_board):
         if str(new_board) == str(self.last_board):
             # print('Nu se respecta regula Ko')
             return False
@@ -305,14 +288,14 @@ class GoState:
         # print('Regula Ko este respectata')
         return True
 
-    def getOppositePlayer(self, player):
-        oppositePlayer = self.players[0]
+    def get_opposite_player(self, player):
+        opposite_player = self.players[0]
         if player == self.players[0]:
-            oppositePlayer = self.players[1]
+            opposite_player = self.players[1]
 
-        return oppositePlayer
+        return opposite_player
 
-    def getValidNeighbours(self, row, col):
+    def get_valid_neighbours(self, row, col):
         dl = [-1, 0, 1, 0]
         dc = [0, 1, 0, -1]
         neighbors = []
@@ -324,26 +307,26 @@ class GoState:
 
         return neighbors
 
-    def tryCapture(self, board, capturedStones, row, col, player):
-        visitedIntersections = []
+    def try_capture(self, board, captured_stones, row, col, player):
+        visited_intersections = []
 
-        oppositePlayer = self.players[0]
+        opposite_player = self.players[0]
         if player == self.players[0]:
-            oppositePlayer = self.players[1]
+            opposite_player = self.players[1]
 
-        neighbors = self.getValidNeighbours(row, col)
+        neighbors = self.get_valid_neighbours(row, col)
         # print(neighbors)
         for neighbor in neighbors:
             i = neighbor[0]
             j = neighbor[1]
-            if board[i][j] == oppositePlayer and (i, j) not in visitedIntersections:
-                groupStones = []
+            if board[i][j] == opposite_player and (i, j) not in visited_intersections:
+                group_stones = []
                 visited = []
-                enemyGroupLiberty = self.hasLiberty(board, i, j, visited, groupStones, oppositePlayer)
-                # print(f'Sunt {row},{col} si am libertati: {enemyGroupLiberty}')
-                visitedIntersections.extend(visited)
+                enemy_group_liberty = self.has_liberty(board, i, j, visited, group_stones, opposite_player)
+                # print(f'Sunt {row},{col} si am libertati: {enemy_group_liberty}')
+                visited_intersections.extend(visited)
                 # Daca grupul inamic nu are libertati, atunci
-                if not enemyGroupLiberty:
-                    for (enemyRow, enemyCol) in groupStones:
-                        board[enemyRow][enemyCol] = 0
-                        capturedStones[player].append((enemyRow, enemyCol))
+                if not enemy_group_liberty:
+                    for (enemy_row, enemy_col) in group_stones:
+                        board[enemy_row][enemy_col] = 0
+                        captured_stones[player].append((enemy_row, enemy_col))

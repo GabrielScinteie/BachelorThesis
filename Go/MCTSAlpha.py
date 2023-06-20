@@ -16,7 +16,7 @@ class MCTSAlpha:
     def search(self, state):
         root = NodeAlpha(self.game, self.args, state, visit_count=1)
 
-        # TODO nu sunt sigur daca aici trebuia sa inversez perspectiva
+
         neutral_state_board = root.state.board
         if root.state.next_to_move == -1:
             neutral_state_board = root.state.get_reversed_perspective()
@@ -47,7 +47,6 @@ class MCTSAlpha:
                 if node.state.next_to_move == -1:
                     value *= -1
             else:
-                # TODO de inteles de ce pun squeeze si unsqueeze
                 neutral_state_board = node.state.board
                 if node.state.next_to_move == -1:
                     neutral_state_board = node.state.get_reversed_perspective()

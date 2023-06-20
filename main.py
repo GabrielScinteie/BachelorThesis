@@ -8,16 +8,14 @@ from matplotlib import pyplot as plt
 from Arena import Arena
 from Go.AlphaZero import AlphaZero
 from Go.MCTSAlpha import MCTSAlpha
-from MCTS.Model import ResNet
+from NeuralNetwork.Model import ResNet
 
 sys.path.append(os.path.abspath('.'))
-sys.path.append(os.path.abspath('./MCTS'))
+sys.path.append(os.path.abspath('NeuralNetwork'))
 sys.path.append(os.path.abspath('./Interface'))
 sys.path.append(os.path.abspath('./Go'))
 
 from Go.Go import Go
-from Go.MCTS import MCTS
-from Go.Node import Node
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -80,7 +78,7 @@ if __name__ == '__main__':
 
     args = {
         'C': 2,
-        'num_searches': 5 * 5 * 3, # cate iteratii face algoritmul de MCTS
+        'num_searches': 5 * 5 * 3, # cate iteratii face algoritmul de NeuralNetwork
         'num_iterations': 100,
         'num_selfPlay_iterations': 96, # cate jocuri se joaca per iteratie
         'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
@@ -103,38 +101,6 @@ if __name__ == '__main__':
 
     # TODO de facut o statistica daca castiga mai des albul sau negrul
     alphaZero.learn()
-
-    # arena = Arena(go)
-    # models_folder_path = ''
-    # for i in range(0, 10):
-    #     for j in range(0, 10):
-    #         if i != j:
-    #             model1 = ResNet(go, 4, 64, device=device)
-    #             model2 = ResNet(go, 4, 64, device=device)
-    #
-    #             model1.load_state_dict(torch.load(models_folder_path + 'model_' + str(i) + '.pt', map_location=device))
-    #             model2.load_state_dict(torch.load(models_folder_path + 'model_' + str(j) + '.pt', map_location=device))
-    #
-    #             optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
-    #             optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
-    #
-    #             arena.play(model1, model2, 'model_' + str(i), 'model_' + str(j), 100, 'arena_results.txt')
-
-    # Testare
-    # tensor_state = torch.tensor(state.get_reversed_perspective(), device=device).unsqueeze(0).unsqueeze(0).float()
-    # model = ResNet(go, 4, 64, device)
-    # model.load_state_dict(torch.load('model_4.pt', map_location=device))
-    # policy, value = model(tensor_state)
-    # value = value.item()
-    # policy = torch.softmax(policy, axis=1).squeeze(0).detach().cpu().numpy()
-    # valid_moves = go.get_valid_moves(state)
-    # policy *= valid_moves
-    # policy /= np.sum(policy)
-    # print(policy)
-    # print(value)
-    #
-    # plt.bar(range(size * size + 1), policy)
-    # plt.show()
 
     def computerVsComputer():
         device = torch.device("cpu")
@@ -165,8 +131,6 @@ if __name__ == '__main__':
             print()
         print(index)
         print(go.get_value_and_terminated(state))
-
-    # computerVsComputer()
 
 
 

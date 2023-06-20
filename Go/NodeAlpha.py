@@ -1,6 +1,5 @@
 import copy
 import math
-import time
 
 import numpy as np
 
@@ -35,7 +34,6 @@ class NodeAlpha:
 
         return best_child
 
-    # TODO de refactorizat MCTS search conform paper-ului
     def get_ucb(self, child):
         child_wins = child.value_sum
 
@@ -49,10 +47,8 @@ class NodeAlpha:
     def expand(self, policy):
         for action, prob in enumerate(policy):
             if prob > 0:
-                # child_state = self.state.deep_copy()
                 child_state = copy.deepcopy(self.state)
                 child_state = self.game.get_next_state(child_state, action, child_state.next_to_move)
-                # child_state = self.game.change_perspective(child_state, player=-1)
 
                 child = NodeAlpha(self.game, self.args, child_state, self, action, prob)
                 self.children.append(child)

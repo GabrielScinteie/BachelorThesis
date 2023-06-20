@@ -34,7 +34,6 @@ class Node:
         return best_child
 
     def get_ucb(self, child):
-        # TODO de unde formula asta?
         child_wins = child.results[self.state.next_to_move]
 
         q_value = child_wins / child.visit_count

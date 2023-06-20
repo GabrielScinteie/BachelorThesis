@@ -4,12 +4,12 @@ import os
 from Arena import Arena
 from Go.AlphaZero import AlphaZero
 from Go.Go import Go
-from MCTS.Model import ResNet
+from NeuralNetwork.Model import ResNet
 
 if __name__ == '__main__':
     args = {
         'C': 2,
-        'num_searches': 5 * 5,  # cate iteratii face algoritmul de MCTS
+        'num_searches': 5 * 5,  # cate iteratii face algoritmul de NeuralNetwork
         'num_iterations': 100,
         'num_selfPlay_iterations': 10,  # cate jocuri se joaca per iteratie
         'num_epochs': 10,  # cate epoci de antrenare se intampla per iteratie

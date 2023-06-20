@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 from Go.Go import Go
 from Go.MCTSAlpha import MCTSAlpha
-from MCTS.Model import ResNet
+from NeuralNetwork.Model import ResNet
 
 
 def augment_data(state, action_probs):
@@ -21,14 +21,14 @@ go = Go(size)
 state = go.get_initial_state()
 
 device = torch.device("cpu")
-model = ResNet(go, 4, 128, device)
+model = ResNet(go, 4, 256, device)
 # model.load_state_dict(torch.load('saved_model/size5/run4/model_9.pt', map_location=device))
-model.load_state_dict(torch.load('learning_results/model_3.pt', map_location=device))
-player = 1
+model.load_state_dict(torch.load('learning_results3/model_2.pt', map_location=device))
+player = -1
 print(state)
 args = {
     'C': 2,
-    'num_searches': 25,  # cate iteratii face algoritmul de MCTS
+    'num_searches': 25,  # cate iteratii face algoritmul de NeuralNetwork
     'num_iterations': 100,
     'num_selfPlay_iterations': 120,  # cate jocuri se joaca per iteratie
     'num_epochs': 2,  # cate epoci de antrenare se intampla per iteratie
