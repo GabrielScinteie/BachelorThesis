@@ -80,12 +80,12 @@ if __name__ == '__main__':
 
     args = {
         'C': 2,
-        'num_searches': 5 * 5 * 2, # cate iteratii face algoritmul de MCTS
+        'num_searches': 5, # cate iteratii face algoritmul de MCTS
         'num_iterations': 100,
-        'num_selfPlay_iterations': 60, # cate jocuri se joaca per iteratie
+        'num_selfPlay_iterations': 4, # cate jocuri se joaca per iteratie
         'num_epochs': 10, # cate epoci de antrenare se intampla per iteratie
         'batch_size': 128, # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
-        'num_processes': 6,
+        'num_processes': 2,
         'temperature': 1,
         'dirichlet_eps': 0.3,
         'dirichlet_alpha': 0.03

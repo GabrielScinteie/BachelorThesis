@@ -160,19 +160,20 @@ class AlphaZero:
     def learn(self):
         directory_path = "learning_results3"
 
-        if os.path.exists(directory_path):
-            shutil.rmtree(directory_path)
-
-        os.makedirs(directory_path)
-
-        if os.path.exists(self.sp_folder_path):
-            shutil.rmtree(self.sp_folder_path)
-
-        os.makedirs(self.sp_folder_path)
+        # DECOMENTEAZA DACA VREI SA STERGI FOLDERUL UNDE SE STOCHEAZA MODELELE
+        # if os.path.exists(directory_path):
+        #     shutil.rmtree(directory_path)
+        #
+        # os.makedirs(directory_path)
+        #
+        # if os.path.exists(self.sp_folder_path):
+        #     shutil.rmtree(self.sp_folder_path)
+        #
+        # os.makedirs(self.sp_folder_path)
 
         no_test_games = self.args['num_selfPlay_iterations']
 
-        for iteration in trange(self.args['num_iterations']):
+        for iteration in trange(4, self.args['num_iterations']):
             self.last_best_model, self.last_best_optimizer = deepcopy(self.model), deepcopy(self.optimizer)
             memory = []
 
@@ -198,8 +199,8 @@ class AlphaZero:
             file_time_logs.write(f'Iteratie {iteration}:\n')
             file_time_logs.write(f'\tTime for selfplay: {self_play_time} s\n')
 
-            for j in range(max(iteration - 5, 0), iteration + 1):
-            # for j in range(iteration, iteration + 1):
+            # for j in range(max(iteration - 1, 0), iteration + 1):
+            for j in range(iteration, iteration + 1):
                 for i in range(self.args['num_processes']):
                     file_name = f'Iteration_{j}/Process_{i}'
 
@@ -231,6 +232,7 @@ class AlphaZero:
                 self.model = self.last_best_model
                 self.optimizer = self.last_best_optimizer
                 f.write(f'{iteration}: old vs new - ({old_best_model} vs {new_model}) winrate_new: {round(new_model/no_test_games,2)} ({avg_game_length}) => model NOT updated\n')
+                f.close()
             else:
                 f.write(f'{iteration}: old vs new - ({old_best_model} vs {new_model}) winrate_new: {round(new_model/no_test_games,2)} ({avg_game_length}) => model     updated\n')
 
