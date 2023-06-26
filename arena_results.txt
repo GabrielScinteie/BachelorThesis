@@ -1,45 +1,59 @@
-model_3 vs model_4 : 9 -11 (14)
-model_3 vs model_5 : 13 -7 (15)
-model_3 vs model_6 : 7 -13 (17)
-model_3 vs model_7 : 8 -12 (18)
-model_3 vs model_8 : 7 -13 (21)
-model_3 vs model_9 : 11 -9 (14)
-model_4 vs model_3 : 7 -13 (17)
-model_4 vs model_5 : 8 -12 (15)
-model_4 vs model_6 : 8 -12 (16)
-model_4 vs model_7 : 7 -13 (15)
-model_4 vs model_8 : 6 -14 (17)
-model_4 vs model_9 : 8 -12 (14)
-model_5 vs model_3 : 15 -5 (14)
-model_5 vs model_4 : 10 -10 (13)
-model_5 vs model_6 : 11 -9 (16)
-model_5 vs model_7 : 11 -9 (15)
-model_5 vs model_8 : 5 -15 (18)
-model_5 vs model_9 : 13 -7 (15)
-model_6 vs model_3 : 12 -8 (15)
-model_6 vs model_4 : 13 -7 (16)
-model_6 vs model_5 : 6 -14 (16)
-model_6 vs model_7 : 10 -10 (15)
-model_6 vs model_8 : 5 -15 (15)
-model_6 vs model_9 : 12 -8 (14)
+model_0 vs model5 : 0 - 50 (27)
+model_0 vs model10 : 0 - 50 (27)
+model_5 vs model10 : 21 - 29 (29)
+model5 vs model15 : 21 - 29 (29)
+model10 vs model15 : 26 - 24 (32)
 
-model_7 vs model_3 : 9 -11 (14)
-model_7 vs model_4 : 13 -7 (16)
-model_7 vs model_5 : 7 -13 (16)
-model_7 vs model_6 : 11 -9 (15)
-model_7 vs model_8 : 3 -17 (19)
-model_7 vs model_9 : 14 -6 (14)
+mcts vs model0 : 3 - 7 (39) 2s mutarea
+mcts vs model14 : 0 - 10 (28) 4s mutarea
 
-model_8 vs model_3 : 13 -7 (18)
-model_8 vs model_4 : 13 -7 (18)
-model_8 vs model_5 : 12 -8 (18)
-model_8 vs model_6 : 12 -8 (17)
-model_8 vs model_7 : 9 -11 (20)
-model_8 vs model_9 : 14 -6 (14)
 
-model_9 vs model_3 : 9 -11 (14)
-model_9 vs model_4 : 8 -12 (13)
-model_9 vs model_5 : 10 -10 (16)
-model_9 vs model_6 : 12 -8 (14)
-model_9 vs model_7 : 8 -12 (14)
-model_9 vs model_8 : 5 -15 (15)
+model10 vs model14 : 27 - 23 (28)
+model10 vs model11 : 20 - 30 (27)
+model10 vs model12 : 27 - 23 (28)
+model5 vs model9 : 23 - 27 (28)
+model5 vs model6 : 24 - 26 (28)
+
+HERE
+
+model0 vs model1 : 14 - 46 (39)
+
+model1 vs model2 : 17 - 43 (34)
+model1 vs model2 : 15 - 45 (35)
+
+model2 vs model3 : 18 - 42 (30)
+model2 vs model3 : 21 - 39 (33)
+model2 vs model3 : 21 - 39 (36)
+
+model3 vs model4 : 19 - 41 (32)
+model3 vs model4 : 10 - 50 (30)
+model3 vs model4 : 18 - 42 (30)
+
+
+
+model_4 vs model_5 : 25 - 35 (33)
+model_4 vs model_5 : 31 - 29 (31)
+model_5 vs model6 : 17 - 43 (33)
+model_5 vs model6 : 35 - 25 (34)
+
+model_6 vs model_7 : 29 - 31 (33)
+model_6 vs model_7 : 29 - 31 (31)
+model_8 vs model_9 : 26 - 34 (31)
+model_8 vs model_9 : 30 - 30 (32)
+
+
+model_0 vs model_1 : 9 - 51 (41) 85%
+model_1 vs model_2 : 18 - 42 (34) 70%
+model_2 vs model_3 : 30 - 90 (33) 75%
+model_3 vs model_4 : 50 - 70 (34) 59%
+model_3 vs model_4 : 51 - 69 (34) 57%
+model_4 vs model_5 : 43 - 77 (30)
+model_5 vs model_6 : 58 - 62 (30)
+model_4 vs model_5 : 46 - 74 (31)
+model_5 vs model_6 : 52 - 68 (30)
+
+LAST RUN
+
+model_0 vs model_1 : 5 - 55 (36)
+model_0 vs model_1 : 5 - 55 (34)
+model_1 vs model_2 : 12 - 48 (30)

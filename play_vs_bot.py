@@ -1,13 +1,12 @@
 # Jucat player vs bot
-from copy import deepcopy
 
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
 
-from Go.Go import Go
-from Go.MCTSAlpha import MCTSAlpha
-from NeuralNetwork.Model import ResNet
+from GameLogic.GoStateManager import GoStateManager
+from Agent.AlphaGoZero.MCTSAlpha import MCTSAlpha
+from Agent.AlphaGoZero.Model import ResNet
 
 
 def augment_data(state, action_probs):
@@ -17,7 +16,7 @@ def augment_data(state, action_probs):
     return rotated_state, rotated_probs
 
 size = 5
-go = Go(size)
+go = GoStateManager(size)
 state = go.get_initial_state()
 
 device = torch.device("cpu")
