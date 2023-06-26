@@ -8,4 +8,4 @@ num_processes : 6
 temperature : 1
 dirichlet_eps : 0.3
 dirichlet_alpha : 0.03
-simulation_time : 1
+simulation_time : 3

@@ -22,17 +22,6 @@ class GoState:
     def __str__(self):
         return np.array2string(np.where(self.board == 1, 'X', np.where(self.board == 0, '.', '0')), separator='')
 
-    def deep_copy(self):
-        # Shallow copy the entire object
-        copied_state = copy.copy(self)
-
-        # Deep copy the mutable fields
-        copied_state.board = copy.deepcopy(self.board)
-        copied_state.captured_stones = copy.deepcopy(self.captured_stones)
-        copied_state.last_board = copy.deepcopy(self.last_board)
-
-        return copied_state
-
     def get_reversed_perspective(self):
         mask_1 = (self.board == 1)
         mask_minus_1 = (self.board == -1)

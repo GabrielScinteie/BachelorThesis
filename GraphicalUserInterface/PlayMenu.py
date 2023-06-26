@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QComboBox, QLabel, QHBoxLayout, QVBoxLayout
 
 from utils import colors
 
+
 class PlayMenu(QWidget):
     def __init__(self, window_size):
         super().__init__()

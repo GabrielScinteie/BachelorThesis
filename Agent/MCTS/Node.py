@@ -46,7 +46,7 @@ class Node:
         # Mark the action as being taken
         self.expandable_moves[action] = 0
 
-        child_state = self.state.deep_copy()
+        child_state = deepcopy(self.state)
         child_state = self.game.get_next_state(child_state, action, child_state.next_to_move)
 
         child = Node(self.game, self.args, child_state, self, action)

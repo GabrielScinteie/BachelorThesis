@@ -48,7 +48,6 @@ if __name__ == '__main__':
     #
     # print(go.get_value_and_terminated(state))
 
-    # Learn
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = ResNet(go, 4, 256, device=device)
     model.load_state_dict(torch.load('learning_results3/model_3.pt', map_location=device))
@@ -59,9 +58,8 @@ if __name__ == '__main__':
 
     args = read_args()
 
-    dataset_path = 'dataset'
     arena = Arena(go, args)
-    alphaZero = AlphaZero(model, optimizer, go, args, dataset_path, arena)
+    alphaZero = AlphaZero(model, optimizer, go, args, arena)
     # TODO incearca sa adaugi mai multe canale ca sa usurezi treaba algoritmului
     #   EXEMPLU: canal 1: valoare booleana pentru piesele tale
     #            canal 2: valoare booleana pentru piesele inamicului

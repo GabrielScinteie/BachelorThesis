@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from GameLogic.GoMove import GoMove
 from GameLogic.GoState import GoState
 
@@ -17,7 +19,7 @@ class GoStateManager:
             row = action // self.size
             column = action % self.size
 
-        new_state = state.deep_copy()
+        new_state = deepcopy(state)
         new_state.move(GoMove(row, column, player))
 
         return new_state

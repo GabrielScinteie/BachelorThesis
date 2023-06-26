@@ -2,7 +2,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QCheckBox, QHBoxLayout, QPushButton, QVBoxLayout
 
-from utils import colors, soundOn
+from utils import colors
+import utils
 from MainMenu import MainMenu
 
 
@@ -53,7 +54,7 @@ class SettingsMenu(QWidget):
         self.style_buttons()
 
     def audio_checkbox_changed(self, new_state):
-        soundOn = new_state
+        utils.soundOn = new_state
 
     def back(self):
         self.hide()

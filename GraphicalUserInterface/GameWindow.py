@@ -123,7 +123,7 @@ class GoBoard(QGraphicsView):
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = ResNet(self.go, 4, 256, device=device)
-        # model.load_state_dict(torch.load('learning_results3/model_0.pt'))
+        model.load_state_dict(torch.load('learning_results/model_8.pt'))
         args = read_args()
         self.mcts = MCTSAlpha(self.go, args, model)
 

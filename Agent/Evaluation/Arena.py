@@ -15,8 +15,6 @@ class Arena:
         self.game = game
         self.args = copy(args)
         self.results_folder = 'arena_results'
-        self.model1_time_spent = 0
-        self.model2_time_spent = 0
 
     def read_result_from_file(self, file_path):
         f = open(file_path, 'r')
