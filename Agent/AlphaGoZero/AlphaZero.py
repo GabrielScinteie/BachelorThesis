@@ -73,7 +73,9 @@ class AlphaZero:
             while True:
                 game_length += 1
 
-                action_probs = self.mcts.search(state)
+                action_probs, number_iterations = self.mcts.search(state)
+                print("here")
+                print(action_probs)
                 augmented_data = self.augment_data(state, action_probs)
 
                 for rotated_state in augmented_data:
@@ -110,11 +112,12 @@ class AlphaZero:
         file_name = f'Iteration_{iteration}/Process_{process_number}'
         self.save_as_pickle(file_name, self_play_samples)
 
+
     def train(self, memory):
-        f = open('loss', 'a')
+        f = open('loss.txt.txt', 'a')
         random.shuffle(memory)
 
-        cumulated_loss = 0
+        cumulated_loss.txt = 0
         batch_size = self.args['batch_size']
         for batch_starting_index in range(0, len(memory), batch_size):
             sample = memory[batch_starting_index:batch_starting_index + batch_size]
@@ -128,17 +131,17 @@ class AlphaZero:
             value_targets = torch.tensor(value_targets, dtype=torch.float32, device=self.model.device)
 
             out_policy, out_value = self.model(states)
-            policy_loss = F.cross_entropy(out_policy, policy_targets)
-            value_loss = F.mse_loss(out_value, value_targets)
-            loss = policy_loss + value_loss
-            cumulated_loss += loss
+            policy_loss.txt = F.cross_entropy(out_policy, policy_targets)
+            value_loss.txt = F.mse_loss.txt(out_value, value_targets)
+            loss.txt = policy_loss.txt + value_loss.txt
+            cumulated_loss.txt += loss.txt
 
             self.optimizer.zero_grad()
-            loss.backward()
+            loss.txt.backward()
             self.optimizer.step()
         
-        cumulated_loss /= (len(memory) // batch_size)
-        f.write(str(cumulated_loss) + '\n')
+        cumulated_loss.txt /= (len(memory) // batch_size)
+        f.write(str(cumulated_loss.txt) + '\n')
         f.close()
 
     def learn(self):
@@ -184,13 +187,13 @@ class AlphaZero:
                     memory.extend(self.load_pickle(file_name))
             print('Marime memorie: ' + str(len(memory)))
 
-            f = open('loss', 'a')
+            f = open('loss.txt.txt', 'a')
             f.write(f'Iteratie: {iteration}\n')
             f.close()
             self.model.train()
             start_time = time.perf_counter()
             for epoch in range(self.args['num_epochs']):
-                f = open('loss', 'a')
+                f = open('loss.txt.txt', 'a')
                 f.write('Epoca ' + str(epoch) + ": ")
                 f.close()
                 self.train(memory)

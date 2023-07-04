@@ -1,8 +1,5 @@
-import copy
 from copy import deepcopy
-
 import numpy as np
-
 from GameLogic.GoMove import GoMove
 
 

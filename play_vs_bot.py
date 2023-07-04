@@ -22,12 +22,12 @@ state = go.get_initial_state()
 device = torch.device("cpu")
 model = ResNet(go, 4, 256, device)
 # model.load_state_dict(torch.load('saved_model/size5/run4/model_9.pt', map_location=device))
-model.load_state_dict(torch.load('learning_results3/model_2.pt', map_location=device))
+model.load_state_dict(torch.load('learning_results3/model_41.pt', map_location=device))
 player = -1
 print(state)
 args = {
     'C': 2,
-    'num_searches': 25,  # cate iteratii face algoritmul de NeuralNetwork
+    'num_searches': 10,  # cate iteratii face algoritmul de NeuralNetwork
     'num_iterations': 100,
     'num_selfPlay_iterations': 120,  # cate jocuri se joaca per iteratie
     'num_epochs': 2,  # cate epoci de antrenare se intampla per iteratie
@@ -35,9 +35,11 @@ args = {
     'num_processes': 6,
     'temperature': 1,
     'dirichlet_eps': 0.2,
-    'dirichlet_alpha': 0.03
+    'dirichlet_alpha': 0.03,
+    'simulation_time' : 0
 }
 mcts = MCTSAlpha(go, args, model)
+
 
 while state.is_game_over() == False:
     if state.next_to_move == player:

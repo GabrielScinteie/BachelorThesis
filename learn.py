@@ -14,15 +14,16 @@ if __name__ == '__main__':
     state = go.get_initial_state()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    args = read_args()
     model = ResNet(go, 4, 256, device=device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args['learning_rate'], weight_decay=args['weight_decay'])
+
     # model.load_state_dict(torch.load('learning_results3/model_3.pt', map_location=device))
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0001)
     # optimizer.load_state_dict(torch.load('learning_results3/optimizer_3.pt', map_location=device))
 
-    args = read_args()
     arena = Arena(go, args)
     alphaZero = AlphaZero(model, optimizer, go, args, arena)
-    alphaZero.learn()
+    # alphaZero.learn()
 
 
 

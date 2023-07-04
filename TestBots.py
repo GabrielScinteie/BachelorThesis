@@ -1,10 +1,12 @@
+import time
+
 import torch
 from Agent.Evaluation.Arena import Arena
 from GameLogic.GoStateManager import GoStateManager
 from Agent.AlphaGoZero.Model import ResNet
 
 if __name__ == '__main__':
-    args = {
+    args_alpha = {
         'C': 2,
         'num_searches': 100,  # cate iteratii face algoritmul de NeuralNetwork
         'num_iterations': 100,
@@ -18,6 +20,20 @@ if __name__ == '__main__':
         'simulation_time': 0
     }
 
+    args = {
+        'C': 2,
+        'num_searches': 100,  # cate iteratii face algoritmul de NeuralNetwork
+        'num_iterations': 100,
+        'num_selfPlay_iterations': 60,  # cate jocuri se joaca per iteratie
+        'num_epochs': 10,  # cate epoci de antrenare se intampla per iteratie
+        'batch_size': 64,  # marimea batch-urilor in care se iau datele in cadrul  unei etape de antrenare
+        'num_processes': 6,
+        'temperature': 1,
+        'dirichlet_eps': 0.3,
+        'dirichlet_alpha': 0.03,
+        'simulation_time': 10
+    }
+
     size = 5
     go = GoStateManager(size)
 
@@ -25,82 +41,40 @@ if __name__ == '__main__':
 
     device = torch.device("cpu")
 
-    # os.remove('arena_results.txt')
-    # models_folder_path = ''
-    # for i in range(0, 100):
-    #     for j in range(i + 1, 100):
-    #         if i != j:
-    #             model1 = ResNet(go, 4, 128, device=device)
-    #             model2 = ResNet(go, 4, 128, device=device)
-    #
-    #             model1.load_state_dict(torch.load(models_folder_path + 'model_'+str(i)+'.pt', map_location=device))
-    #             model2.load_state_dict(torch.load(models_folder_path + 'model_'+str(j)+'.pt', map_location=device))
-    #
-    #             optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
-    #             optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
-    #
-    #             arena.play(model1, model2, 'model_'+str(i), 'model_'+str(j), 100, 'arena_results.txt')
-
     model1 = ResNet(go, 4, 256, device=device)
     model2 = ResNet(go, 4, 256, device=device)
 
-    # model1.load_state_dict(torch.load('learning_results/model_3.pt'))
-    # model2.load_state_dict(torch.load('learning_results/model_4_vechi.pt'))
-    #
-    # same = True
-    # for p1, p2 in zip(model1.parameters(), model2.parameters()):
-    #     if p1.data.ne(p2.data).sum() > 0:
-    #         same = False
-    #
-    # print(same)
-    # model1.load_state_dict(torch.load('learning_results3/model_4 (1).pt', map_location=device))
-    # model2.load_state_dict(torch.load('learning_results3/model_5 (1).pt', map_location=device))
 
-    model1.eval()
-    model2.eval()
+    for i in range(44, 46):
+        model1.load_state_dict(torch.load(f'learning_results3/model_{i}.pt', map_location=device))
+        arena.play(None, model1, 'mcts', f'model_{i}', args['num_selfPlay_iterations'], 'arena_results.txt')
 
-    # optimizer8 = torch.optim.Adam(model1.parameters(), lr=0.001)
-    # optimizer2 = torch.optim.Adam(model2.parameters(), lr=0.001)
-    # arena.play(model1, model2, 'model_4', 'model_5', 60, 'arena_results.txt')
-    # arena.play(model1, model2, 'model_4', 'model_5', 60, 'arena_results.txt')
     #
-    # model1.load_state_dict(torch.load('learning_results3/model_5 (1).pt', map_location=device))
-    # model2.load_state_dict(torch.load('learning_results3/model_6 (1).pt', map_location=device))
+    # arena.play(model1, model2, 'model_15', 'model_20', args['num_selfPlay_iterations'], 'arena_results.txt')
     #
-    # arena.play(model1, model2, 'model_5', 'model6', 60, 'arena_results.txt')
-    # arena.play(model1, model2, 'model_5', 'model6', 60, 'arena_results.txt')
+    # model1.load_state_dict(torch.load('learning_results3/model_10.pt', map_location=device))
+    # model2.load_state_dict(torch.load('learning_results3/model_20.pt', map_location=device))
     #
-    # model1.load_state_dict(torch.load('learning_results3/model_6 (1).pt', map_location=device))
-    # model2.load_state_dict(torch.load('learning_results3/model_7 (1).pt', map_location=device))
+    # arena.play(model1, model2, 'model_10', 'model_20', args['num_selfPlay_iterations'], 'arena_results.txt')
     #
-    # arena.play(model1, model2, 'model_6', 'model_7', 60, 'arena_results.txt')
-    # arena.play(model1, model2, 'model_6', 'model_7', 60, 'arena_results.txt')
+    # model1.load_state_dict(torch.load('learning_results3/model_5.pt', map_location=device))
+    # model2.load_state_dict(torch.load('learning_results3/model_20.pt', map_location=device))
+    # arena.play(model1, model2, 'model_5', 'model_20', args['num_selfPlay_iterations'], 'arena_results.txt')
+
     #
-    # model1.load_state_dict(torch.load('learning_results3/model_7 (1).pt', map_location=device))
-    # model2.load_state_dict(torch.load('learning_results3/model_8 (1).pt', map_location=device))
+    # model1.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
+    # model2.load_state_dict(torch.load('learning_results/model_2.pt', map_location=device))
     #
-    # arena.play(model1, model2, 'model_7', 'model_8', 60, 'arena_results.txt')
-    # arena.play(model1, model2, 'model_7', 'model_8', 60, 'arena_results.txt')
-
-    model1.load_state_dict(torch.load('learning_results/model_0.pt', map_location=device))
-    model2.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
-
-    arena.play(model1, model2, 'model_0', 'model_1', args['num_selfPlay_iterations'], 'arena_results.txt')
-    arena.play(model1, model2, 'model_0', 'model_1', args['num_selfPlay_iterations'], 'arena_results.txt')
-
-    model1.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
-    model2.load_state_dict(torch.load('learning_results/model_2.pt', map_location=device))
-
-    arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
-    arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
-
-    model1.load_state_dict(torch.load('learning_results/model_0.pt', map_location=device))
-    model2.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
-    arena.play(model1, model2, 'model_0', 'model_1', args['num_selfPlay_iterations'], 'arena_results.txt')
-
-    model1.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
-    model2.load_state_dict(torch.load('learning_results/model_2.pt', map_location=device))
-    arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
+    # arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
+    # arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
+    #
+    # model1.load_state_dict(torch.load('learning_results/model_0.pt', map_location=device))
+    # model2.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
+    # arena.play(model1, model2, 'model_0', 'model_1', args['num_selfPlay_iterations'], 'arena_results.txt')
+    #
+    # model1.load_state_dict(torch.load('learning_results/model_1.pt', map_location=device))
+    # model2.load_state_dict(torch.load('learning_results/model_2.pt', map_location=device))
+    # arena.play(model1, model2, 'model_1', 'model_2', args['num_selfPlay_iterations'], 'arena_results.txt')
 
     # model1.load_state_dict(torch.load('learning_results3/model_0 (1).pt', map_location=device))
     # model2.load_state_dict(torch.load('learning_results3/model_5 (1).pt', map_location=device))

@@ -1,12 +1,13 @@
 import os
 import shutil
+import time
 from copy import copy
 
 import numpy as np
 import torch.multiprocessing as mp
 from tqdm import trange
 
-from Agent.MCTS import MCTS
+from Agent.MCTS.MCTS import MCTS
 from Agent.AlphaGoZero.MCTSAlpha import MCTSAlpha
 
 
@@ -39,12 +40,15 @@ class Arena:
 
         state = self.game.get_initial_state()
         game_length = 0
-
+        search_1 = 0
+        search_2 = 0
         while state.is_game_over() == False:
             if game_length % 2 == 0:
-                action_probs = mcts1.search(state)
+                action_probs, no_iter = mcts1.search(state)
+                search_1 += no_iter
             else:
-                action_probs = mcts2.search(state)
+                action_probs, no_iter = mcts2.search(state)
+                search_2 += no_iter
 
             valid_moves = self.game.get_valid_moves(state)
             action_probs *= valid_moves
@@ -64,7 +68,7 @@ class Arena:
         # file.write(f'A castigat jucatorul {result} in {game_length} miscari cu scorurile {scores}.\n')
         if file_path is not None:
             f.close()
-        return result, game_length
+        return result, game_length, search_1, search_2
 
     def play_games(self, model1, model2, file_path, number_games, process_number):
         file_name = f'{self.results_folder}/Process_{process_number}'
@@ -74,8 +78,12 @@ class Arena:
         model1_wins_number = 0
         model2_wins_number = 0
 
+        search_1 = 0
+        search_2 = 0
         for i in trange(number_games // 2):
-            result, game_length = self.play_one_game(model1, model2, file_path)
+            result, game_length, no_iter_1, no_iter_2 = self.play_one_game(model1, model2, file_path)
+            search_1 += no_iter_1
+            search_2 += no_iter_2
             medium_game_length += game_length
             if result == 1:
                 model1_wins_number += 1
@@ -83,7 +91,9 @@ class Arena:
                 model2_wins_number += 1
 
         for i in trange(number_games // 2, number_games):
-            result, game_length = self.play_one_game(model2, model1, file_path)
+            result, game_length, no_iter_2, no_iter_1 = self.play_one_game(model2, model1, file_path)
+            search_1 += no_iter_1
+            search_2 += no_iter_2
             medium_game_length += game_length
             if result == 1:
                 model2_wins_number += 1
@@ -91,7 +101,7 @@ class Arena:
                 model1_wins_number += 1
 
         medium_game_length = medium_game_length // number_games
-        f.write(f'{model1_wins_number} {model2_wins_number} {medium_game_length}')
+        f.write(f'{model1_wins_number} {model2_wins_number} {medium_game_length} {search_1} {search_2}')
         f.close()
 
     def play(self, model1, model2, model1_name, model2_name, number_games, file_path=None):
@@ -109,6 +119,7 @@ class Arena:
         model2_wins_number = 0
         medium_game_length = 0
 
+        start_time = time.perf_counter()
         processes = []
         games_per_process = number_games // self.args['num_processes']
         for process_number in range(self.args['num_processes']):
@@ -119,17 +130,22 @@ class Arena:
         for p in processes:
             p.join()
 
+        search_1 = 0
+        search_2 = 0
         for process_number in range(self.args['num_processes']):
-            model1_wins, model2_wins, game_length = self.read_result_from_file(
+            model1_wins, model2_wins, game_length, no_iter_1, no_iter_2 = self.read_result_from_file(
                 f'{self.results_folder}/Process_{process_number}')
+            search_1 += int(no_iter_1)
+            search_2 += int(no_iter_2)
             model1_wins_number += int(model1_wins)
             model2_wins_number += int(model2_wins)
             medium_game_length += int(game_length)
 
         medium_game_length //= self.args['num_processes']
+        end_time = time.perf_counter()
         if file_path is not None:
             f.write(
-                f'\n{model1_name} vs {model2_name} : {model1_wins_number} - {model2_wins_number} ({str(medium_game_length)})')
+                f'\n{model1_name} vs {model2_name} : {model1_wins_number} - {model2_wins_number} {round(model2_wins_number * 100 / number_games, 2)}% ({str(medium_game_length)}) timp: {round(end_time - start_time, 2)}, iteratii_1: {search_1} iteratii_2: {search_2}')
             f.close()
 
         return model1_wins_number, model2_wins_number, medium_game_length

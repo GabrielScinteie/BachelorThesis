@@ -50,9 +50,9 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = ResNet(go, 4, 256, device=device)
-    model.load_state_dict(torch.load('learning_results3/model_3.pt', map_location=device))
+    # model.load_state_dict(torch.load('learning_results3/model_3.pt', map_location=device))
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0001)
-    optimizer.load_state_dict(torch.load('learning_results3/optimizer_3.pt', map_location=device))
+    # optimizer.load_state_dict(torch.load('learning_results3/optimizer_3.pt', map_location=device))
 
     # num_iterations * num_selfPlay_iterations * nr_mutari joc * num_searches = 3 * 20 * 100 = 6000
 

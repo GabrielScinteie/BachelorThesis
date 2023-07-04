@@ -1,59 +1,46 @@
-model_0 vs model5 : 0 - 50 (27)
-model_0 vs model10 : 0 - 50 (27)
-model_5 vs model10 : 21 - 29 (29)
-model5 vs model15 : 21 - 29 (29)
-model10 vs model15 : 26 - 24 (32)
-
-mcts vs model0 : 3 - 7 (39) 2s mutarea
-mcts vs model14 : 0 - 10 (28) 4s mutarea
-
-
-model10 vs model14 : 27 - 23 (28)
-model10 vs model11 : 20 - 30 (27)
-model10 vs model12 : 27 - 23 (28)
-model5 vs model9 : 23 - 27 (28)
-model5 vs model6 : 24 - 26 (28)
-
-HERE
-
-model0 vs model1 : 14 - 46 (39)
-
-model1 vs model2 : 17 - 43 (34)
-model1 vs model2 : 15 - 45 (35)
-
-model2 vs model3 : 18 - 42 (30)
-model2 vs model3 : 21 - 39 (33)
-model2 vs model3 : 21 - 39 (36)
-
-model3 vs model4 : 19 - 41 (32)
-model3 vs model4 : 10 - 50 (30)
-model3 vs model4 : 18 - 42 (30)
-
-
-
-model_4 vs model_5 : 25 - 35 (33)
-model_4 vs model_5 : 31 - 29 (31)
-model_5 vs model6 : 17 - 43 (33)
-model_5 vs model6 : 35 - 25 (34)
-
-model_6 vs model_7 : 29 - 31 (33)
-model_6 vs model_7 : 29 - 31 (31)
-model_8 vs model_9 : 26 - 34 (31)
-model_8 vs model_9 : 30 - 30 (32)
-
-
-model_0 vs model_1 : 9 - 51 (41) 85%
-model_1 vs model_2 : 18 - 42 (34) 70%
-model_2 vs model_3 : 30 - 90 (33) 75%
-model_3 vs model_4 : 50 - 70 (34) 59%
-model_3 vs model_4 : 51 - 69 (34) 57%
-model_4 vs model_5 : 43 - 77 (30)
-model_5 vs model_6 : 58 - 62 (30)
-model_4 vs model_5 : 46 - 74 (31)
-model_5 vs model_6 : 52 - 68 (30)
-
-LAST RUN
-
-model_0 vs model_1 : 5 - 55 (36)
-model_0 vs model_1 : 5 - 55 (34)
-model_1 vs model_2 : 12 - 48 (30)
+mcts vs model_0 : 41 - 19 31.67% (33) timp: 3153.7, iteratii_1: 86522 iteratii_2: 6366101
+mcts vs model_1 : 1 - 59 98.33% (36) timp: 3467.48, iteratii_1: 94145 iteratii_2: 1531125
+mcts vs model_2 : 14 - 46 76.67% (34) timp: 3459.74, iteratii_1: 88655 iteratii_2: 2843263
+mcts vs model_3 : 15 - 45 75.0% (35) timp: 3360.37, iteratii_1: 89868 iteratii_2: 2921943
+mcts vs model_4 : 9 - 51 85.0% (35) timp: 3463.19, iteratii_1: 93371 iteratii_2: 1871316
+mcts vs model_5 : 13 - 47 78.33% (36) timp: 3514.52, iteratii_1: 96109 iteratii_2: 2964533
+mcts vs model_6 : 6 - 54 90.0% (33) timp: 3234.82, iteratii_1: 85602 iteratii_2: 1772211
+mcts vs model_7 : 2 - 58 96.67% (34) timp: 3359.26, iteratii_1: 88246 iteratii_2: 1329078
+mcts vs model_8 : 1 - 59 98.33% (33) timp: 3245.37, iteratii_1: 85306 iteratii_2: 1283565
+mcts vs model_9 : 3 - 57 95.0% (36) timp: 3361.62, iteratii_1: 95083 iteratii_2: 1418528
+mcts vs model_10 : 1 - 59 98.33% (34) timp: 3308.09, iteratii_1: 85371 iteratii_2: 1397761
+mcts vs model_11 : 2 - 58 96.67% (33) timp: 3179.27, iteratii_1: 90518 iteratii_2: 2053142
+mcts vs model_12 : 3 - 57 95.0% (33) timp: 3229.8, iteratii_1: 90415 iteratii_2: 1777224
+mcts vs model_13 : 3 - 57 95.0% (36) timp: 3369.46, iteratii_1: 97738 iteratii_2: 2130937
+mcts vs model_14 : 7 - 53 88.33% (34) timp: 20677.29, iteratii_1: 91813 iteratii_2: 2994736
+mcts vs model_15 : 5 - 55 91.67% (34) timp: 3154.12, iteratii_1: 89148 iteratii_2: 2307327
+mcts vs model_16 : 5 - 55 91.67% (36) timp: 3626.37, iteratii_1: 97892 iteratii_2: 2584960
+mcts vs model_17 : 7 - 53 88.33% (36) timp: 3341.02, iteratii_1: 94616 iteratii_2: 2369717
+mcts vs model_18 : 10 - 50 83.33% (35) timp: 3553.88, iteratii_1: 92849 iteratii_2: 3339646
+mcts vs model_19 : 3 - 57 95.0% (32) timp: 3234.8, iteratii_1: 86540 iteratii_2: 1346504
+mcts vs model_20 : 8 - 52 86.67% (36) timp: 3608.75, iteratii_1: 94582 iteratii_2: 3770040
+mcts vs model_21 : 5 - 55 91.67% (35) timp: 3539.78, iteratii_1: 88766 iteratii_2: 2093409
+mcts vs model_22 : 9 - 51 85.0% (35) timp: 3481.24, iteratii_1: 92833 iteratii_2: 3543301
+mcts vs model_23 : 3 - 57 95.0% (34) timp: 3174.37, iteratii_1: 89866 iteratii_2: 1551989
+mcts vs model_24 : 5 - 55 91.67% (35) timp: 3387.12, iteratii_1: 93468 iteratii_2: 1975461
+mcts vs model_25 : 7 - 53 88.33% (36) timp: 3821.23, iteratii_1: 81470 iteratii_2: 1439903
+mcts vs model_26 : 6 - 54 90.0% (35) timp: 3714.22, iteratii_1: 77191 iteratii_2: 1192168
+mcts vs model_27 : 6 - 54 90.0% (37) timp: 4071.93, iteratii_1: 82152 iteratii_2: 1392464
+mcts vs model_28 : 6 - 54 90.0% (36) timp: 3777.45, iteratii_1: 81292 iteratii_2: 1094387
+mcts vs model_29 : 2 - 58 96.67% (36) timp: 3755.73, iteratii_1: 81204 iteratii_2: 1157444
+mcts vs model_30 : 3 - 57 95.0% (35) timp: 3704.58, iteratii_1: 74762 iteratii_2: 926755
+mcts vs model_31 : 1 - 59 98.33% (36) timp: 3713.79, iteratii_1: 78316 iteratii_2: 1053715
+mcts vs model_32 : 2 - 58 96.67% (35) timp: 3664.17, iteratii_1: 75366 iteratii_2: 948797
+mcts vs model_33 : 2 - 58 96.67% (35) timp: 3860.31, iteratii_1: 74377 iteratii_2: 1094714
+mcts vs model_34 : 2 - 58 96.67% (33) timp: 3899.58, iteratii_1: 70945 iteratii_2: 1061254
+mcts vs model_35 : 5 - 55 91.67% (33) timp: 3610.26, iteratii_1: 71216 iteratii_2: 1062614
+mcts vs model_36 : 0 - 60 100.0% (34) timp: 3569.74, iteratii_1: 75930 iteratii_2: 969675
+mcts vs model_37 : 0 - 60 100.0% (35) timp: 4656.63, iteratii_1: 77339 iteratii_2: 910290
+mcts vs model_38 : 2 - 58 96.67% (36) timp: 3953.71, iteratii_1: 79924 iteratii_2: 1045911
+mcts vs model_39 : 7 - 53 88.33% (36) timp: 3773.21, iteratii_1: 80885 iteratii_2: 1680681
+mcts vs model_40 : 4 - 56 93.33% (33) timp: 3521.81, iteratii_1: 72236 iteratii_2: 1738495
+mcts vs model_41 : 2 - 58 96.67% (34) timp: 3645.92, iteratii_1: 72466 iteratii_2: 929565
+mcts vs model_42 : 3 - 57 95.00% (35) timp: 3682.90, iteratii_1: 85478 iteratii_2: 2242987
+mcts vs model_43 : 1 - 59 98.33% (35) timp: 3382.84, iteratii_1: 92962 iteratii_2: 1658887
+mcts vs model_44 : 4 - 56 93.33% (33) timp: 3046.85, iteratii_1: 89025 iteratii_2: 1896658
+mcts vs model_45 : 3 - 57 95.0% (33) timp: 3173.66, iteratii_1: 87697 iteratii_2: 2558156

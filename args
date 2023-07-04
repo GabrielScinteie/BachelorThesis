@@ -8,4 +8,6 @@ num_processes : 6
 temperature : 1
 dirichlet_eps : 0.3
 dirichlet_alpha : 0.03
-simulation_time : 3
+simulation_time : 5
+learning_rate : 0.005
+weight_decay : 0.0001

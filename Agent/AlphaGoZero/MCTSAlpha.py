@@ -90,4 +90,4 @@ class MCTSAlpha:
         # We normalize the probabilities
         action_probs /= np.sum(action_probs)
 
-        return action_probs
+        return action_probs, search

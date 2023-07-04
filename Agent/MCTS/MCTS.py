@@ -19,27 +19,26 @@ class MCTS:
 
         search = 0
         while True:
-            if timing == True :
-                if time.time() > ending_time:
-                    # print(f'MCTS a reusit sa faca {search} iteratii in timpul stabilit!')
-                    break
+            if timing and time.time() > ending_time:
+                # print(f'MCTS a reusit sa faca {search} iteratii in timpul stabilit!')
+                break
             elif search > self.args['num_searches']:
                 # print(f'MCTS a reusit sa faca {search} iteratii in timpul stabilit!')
                 break
 
             node = root
-            # print(f'Simularea numarul {search}')
-            # Traverse the tree by choosing the child with best UCB score at any point until I reach a node that hasn't been fully expanded
+
+            # Traverse the tree by choosing the child with best UCB score until I reach a node that hasn't been fully expanded
             while node.is_fully_expanded():
                 node = node.select()
 
             # We check if we reached a terminal state
             value, score, is_terminal = self.game.get_value_and_terminated(node.state)
-            # If it's white to move then the need to swap the sign of the value because the value is from the perspective of black
 
             # If the state is not terminal, then we expand it by taking a random action, then we simulate
             if is_terminal:
                 if node.state.next_to_move == -1:
+                    # If it's white to move then the need to swap the sign of the value because the value is from the perspective of black
                     value *= -1
             else:
                 node = node.expand()
@@ -59,9 +58,7 @@ class MCTS:
         # We normalize the probabilities
         action_probs /= np.sum(action_probs)
 
-        # self.print_tree_dfs(root)
-
-        return action_probs
+        return action_probs, search
 
     def print_tree_dfs(self, node, level=0):
         indent = '---' * level

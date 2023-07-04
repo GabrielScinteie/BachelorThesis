@@ -3,7 +3,6 @@ from copy import deepcopy
 from GameLogic.GoMove import GoMove
 from GameLogic.GoState import GoState
 
-
 class GoStateManager:
     def __init__(self, size):
         self.size = size
