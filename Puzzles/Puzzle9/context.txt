@@ -1,0 +1,3 @@
+player_to_move : -1
+good_answers : [(1, 4)] 
+explanation : Este necesara asezarea unei piese pe pozitia (1, 4) pentru a nu permite jucatorului negru sa plaseze pe pozitia (1, 4) facand un grup viu

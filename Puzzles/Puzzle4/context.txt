@@ -1,0 +1,3 @@
+player_to_move : 1
+good_answers : [(4, 1)] 
+explanation : Mutarea (4, 1) salveaza grupul negru

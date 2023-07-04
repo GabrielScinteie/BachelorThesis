@@ -1,9 +1,12 @@
+import traceback
+
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFileDialog
+from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFileDialog, QMessageBox
 
+from GraphicalUserInterface.Puzzle import Puzzle
 from utils import colors
-from MainWindow import app
+from main import app
 from PlayMenu import PlayMenu
 
 
@@ -86,15 +89,30 @@ class MainMenu(QWidget):
         self.settings.show()
 
     def puzzle(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt);;All Files (*)",
-                                                   options=options)
-        if file_path:
-            with open(file_path, "r") as file:
-                file_contents = file.read()
-                print(file_contents)
+        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder", "", QFileDialog.ShowDirsOnly)
+
+        if folder_path != '':
+            puzzle = Puzzle()
+            puzzle.load_from_folder(folder_path)
+
+            from GameWindow import GameWindow
+            self.hide()
+
+            self.game = GameWindow(self.window_size, puzzle)  # Create an instance of the Game widget
+            self.game.show()  # Show the Game widget
+            # except Exception as e:
+            #     stack_trace = traceback.format_exc()
+            #     popup = QMessageBox()
+            #     popup.setWindowTitle("Folder invalid")
+            #     popup.setText("Folder invalid!")
+            #     popup.setStandardButtons(QMessageBox.Ok)
+            #     popup.exec_()
+
+
 
     def play(self):
+        from GameWindow import GameWindow
         self.hide()
-        self.game = PlayMenu(self.window_size)  # Create an instance of the Game widget
+
+        self.game = GameWindow(self.window_size)  # Create an instance of the Game widget
         self.game.show()  # Show the Game widget

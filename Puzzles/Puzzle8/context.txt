@@ -1,0 +1,3 @@
+player_to_move : 1
+good_answers : [(2, 2), ] 
+explanation : Mutarea (2, 2) captureaza grupul alb

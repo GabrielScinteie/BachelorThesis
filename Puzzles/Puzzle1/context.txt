@@ -1,0 +1,3 @@
+player_to_move : 1
+good_answers : [(2, 3)] 
+explanation : Prin asezarea unei piese negre pe pozitia (2, 3) este capturata o piesa alba

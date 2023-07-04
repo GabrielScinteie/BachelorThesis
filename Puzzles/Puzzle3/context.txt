@@ -1,0 +1,3 @@
+player_to_move : -1
+good_answers : [(-1, -1)] 
+explanation : Orice mutare in afara de pas este in detrimentul playerului alb
