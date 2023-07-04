@@ -49,7 +49,6 @@ class GameWindow(QWidget):
         #
         # self.number_label.move(x_coordinate, y_coordinate)  # Set the position of the label
 
-
         # Add the buttons to a layout
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.pass_button)
@@ -66,8 +65,6 @@ class GameWindow(QWidget):
             button_layout.addWidget(self.play_bot_move_button)
             button_layout.addWidget(self.help_button)
 
-
-
         # Create a widget to hold the buttons
         button_widget = QWidget()
         button_widget.setLayout(button_layout)
@@ -83,6 +80,7 @@ class GameWindow(QWidget):
         self.resize(self.window_size, self.window_size)
 
         self.style_buttons()
+
     def help(self):
         popup = QMessageBox()
         popup.setWindowTitle('Explicație')
